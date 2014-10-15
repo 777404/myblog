@@ -8,15 +8,14 @@ import akka.io.TcpMessage;
 import akka.util.ByteIterator;
 import akka.util.ByteString;
 import akka.util.ByteStringBuilder;
-import com.github.zxh.akka.minirpg.message.JsonMessage;
+import com.github.zxh.akka.minirpg.message.GameMessage;
+import com.google.gson.Gson;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
 public class MsgCodec extends UntypedActor {
-
-
+    
+    private static final Gson GSON = new Gson();
     
     private final ActorRef connection;
     private ByteString buf = ByteString.empty();
@@ -36,8 +35,8 @@ public class MsgCodec extends UntypedActor {
             //getSender().tell(msg, getSelf());
         } else if (msg instanceof ConnectionClosed) {
             getContext().stop(getSelf());
-        } else if (msg instanceof JsonMessage) {
-            ByteString data = encodeMsg((JsonMessage) msg);
+        } else if (msg instanceof GameMessage) {
+            ByteString data = encodeMsg(msg);
             connection.tell(TcpMessage.write(data), getSelf());
         }
     }
@@ -53,12 +52,14 @@ public class MsgCodec extends UntypedActor {
         }
     }
     
-    private ByteString encodeMsg(JsonMessage msg) {
-        byte[] jsonBytes = msg.getJson().getBytes(StandardCharsets.UTF_8);
+    private ByteString encodeMsg(Object msg) {
+        final int msgId = MsgRegistry.getMsgId(msg);
+        final byte[] jsonBytes = GSON.toJson(msg)
+                .getBytes(StandardCharsets.UTF_8);
         
-        ByteStringBuilder bsb = new ByteStringBuilder();
+        final ByteStringBuilder bsb = new ByteStringBuilder();
         bsb.putInt(4 + jsonBytes.length, ByteOrder.BIG_ENDIAN);
-        bsb.putInt(msg.getId(), ByteOrder.BIG_ENDIAN);
+        bsb.putInt(msgId, ByteOrder.BIG_ENDIAN);
         bsb.putBytes(jsonBytes);
         
         return bsb.result();

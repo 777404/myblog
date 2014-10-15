@@ -28,6 +28,7 @@ dependencies {
     //   http://www.gradle.org/docs/current/userguide/dependency_management.html#sec:how_to_declare_your_dependencies
     compile 'com.typesafe.akka:akka-actor_2.11:2.3.6'
     compile 'org.scala-lang:scala-library:2.11.2'
+    compile 'com.google.code.gson:gson:2.3'
     
     testCompile 'junit:junit:4.10'
 }
