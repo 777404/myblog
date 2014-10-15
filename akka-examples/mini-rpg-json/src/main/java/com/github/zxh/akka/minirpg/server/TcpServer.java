@@ -12,6 +12,12 @@ import java.net.InetSocketAddress;
 
 public class TcpServer extends UntypedActor {
     
+    private final ActorRef msgHandler;
+    
+    public TcpServer(ActorRef msgHandler) {
+        this.msgHandler = msgHandler;
+    }
+    
     @Override
     public void onReceive(Object msg) throws Exception {
         System.out.println("TcpServer received:" + msg);
@@ -39,7 +45,7 @@ public class TcpServer extends UntypedActor {
     }
     
     private void registerCodec(ActorRef connection) {
-        final Props codecProps = Props.create(MsgCodec.class, connection);
+        final Props codecProps = Props.create(MsgCodec.class, connection, msgHandler);
         final ActorRef codec = getContext().actorOf(codecProps);
         connection.tell(TcpMessage.register(codec), getSelf());
     }
