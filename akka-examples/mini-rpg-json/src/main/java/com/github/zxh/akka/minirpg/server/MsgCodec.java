@@ -10,7 +10,7 @@ public class MsgCodec extends UntypedActor {
 
     @Override
     public void onReceive(Object msg) throws Exception {
-        System.out.println("Handler received:" + msg);
+        System.out.println("MsgCodec received:" + msg);
         
         if (msg instanceof Received) {
             final ByteString data = ((Received) msg).data();
