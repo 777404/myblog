@@ -4,8 +4,10 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.io.Tcp;
+import akka.util.ByteIterator;
 import akka.util.ByteString;
 import akka.util.ByteStringBuilder;
+import java.nio.ByteOrder;
 import java.util.Arrays;
 
 public class Main {
@@ -17,17 +19,24 @@ public class Main {
 //        ActorRef accepter = mySystem.actorOf(accepterProps, "accepter");
 //        accepter.tell(12345, ActorRef.noSender());
         
-        ByteString bs = ByteString.empty();
-        ByteString bs2 = bs.concat(ByteString.fromString("abc"));
-        System.out.println(Arrays.toString(bs.toArray()));
-        System.out.println(Arrays.toString(bs2.toArray()));
-        
-//        bs2.tak
-        
         ByteStringBuilder bsb = new ByteStringBuilder();
-        bsb.append(bs);
+        bsb.putInt(2, ByteOrder.BIG_ENDIAN);
+        bsb.putInt(3, ByteOrder.BIG_ENDIAN);
+        bsb.putInt(4, ByteOrder.BIG_ENDIAN);
         
-//        bsb.
+        ByteString bs = bsb.result();
+        System.out.println(bs.take(4));
+        bs.drop(4);
+        System.out.println(bs.take(4));
+        System.out.println(bs.length());
+        
+        ByteIterator bi = bs.iterator();
+        System.out.println(bi.getInt(ByteOrder.BIG_ENDIAN));
+        System.out.println(bi.getInt(ByteOrder.BIG_ENDIAN));
+        System.out.println(bi.getInt(ByteOrder.BIG_ENDIAN));
+        
+        System.out.println(bs.take(4));
+        System.out.println(bs.length());
     }
     
 }

@@ -26,8 +26,7 @@ public class TcpServer extends UntypedActor {
         } else if (msg instanceof Connected) {
             final Connected conn = (Connected) msg;
             getSender().tell(conn, getSelf());
-            final ActorRef handler = getContext().actorOf(Props.create(MsgCodec.class));
-            getSender().tell(TcpMessage.register(handler), getSelf());
+            registerCodec(getSender());
         }
     }
     
@@ -37,6 +36,12 @@ public class TcpServer extends UntypedActor {
         Tcp.get(getContext().system())
                 .getManager()
                 .tell(bindCmd, getSelf());
+    }
+    
+    private void registerCodec(ActorRef connection) {
+        final Props codecProps = Props.create(MsgCodec.class, connection);
+        final ActorRef codec = getContext().actorOf(codecProps);
+        connection.tell(TcpMessage.register(codec), getSelf());
     }
     
 }
