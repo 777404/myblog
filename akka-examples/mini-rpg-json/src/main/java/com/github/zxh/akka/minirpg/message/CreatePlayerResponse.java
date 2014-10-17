@@ -1,6 +1,6 @@
 package com.github.zxh.akka.minirpg.message;
 
-public class CreatePlayerResponse implements GameMessage {
+public class CreatePlayerResponse implements GameResponse {
     
     private final int playerId;
 

@@ -1,6 +1,6 @@
 package com.github.zxh.akka.minirpg.message;
 
-public class CreatePlayerRequest implements GameMessage {
+public class CreatePlayerRequest implements GameRequest {
     
     private final String playerName;
 
