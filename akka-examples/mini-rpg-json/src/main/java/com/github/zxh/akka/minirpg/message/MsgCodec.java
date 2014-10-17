@@ -9,6 +9,8 @@ import akka.util.ByteIterator;
 import akka.util.ByteString;
 import akka.util.ByteStringBuilder;
 import com.google.gson.Gson;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 
@@ -49,20 +51,20 @@ public class MsgCodec extends UntypedActor {
             final int jsonLength = it.getInt(ByteOrder.BIG_ENDIAN);
             
             if (buf.length() >= 8 + jsonLength) {
-                byte[] jsonData = new byte[jsonLength];
-                it.getBytes(jsonData);
-                final Object msg = decodeMsg(msgId, jsonData);
+                final Object msg = decodeMsg(msgId, buf.slice(8, 8 + jsonLength));
                 buf = buf.drop(8 + jsonLength);
                 msgHandler.tell(msg, getSelf());
             }
         }
     }
     
-    private Object decodeMsg(int msgId, byte[] jsonData) {
+    private Object decodeMsg(int msgId, ByteString jsonData) {
         final Class<?> msgClass = MsgRegistry.getMsgClass(msgId);
-        String jsonStr = new String(jsonData, StandardCharsets.UTF_8);
-        System.out.println(jsonStr);
-        return GSON.fromJson(jsonStr, msgClass);
+        final Reader reader = new InputStreamReader(
+                jsonData.iterator().asInputStream(),
+                StandardCharsets.UTF_8);
+
+        return GSON.fromJson(reader, msgClass);
     }
     
     private ByteString encodeMsg(Object msg) {
