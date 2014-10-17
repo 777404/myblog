@@ -11,24 +11,26 @@ import java.net.InetSocketAddress;
 public class ClientApp {
     
     public static void main(String[] args) {
-        ActorSystem mySystem = ActorSystem.create("miniRPG");
+        ActorSystem mySystem = ActorSystem.create("rpgClient");
         ActorRef tcpClient = mySystem.actorOf(Props.create(TcpClient.class));
         tcpClient.tell(new InetSocketAddress("localhost", 12345), ActorRef.noSender());
         
-        while (true) {
-            Object msg = parseCmd();
-            if (msg != null) {
-                tcpClient.tell(msg, ActorRef.noSender());
+        Console console = System.console();
+        if (console != null) {
+            while (true) {
+                Object msg = parseCmd(console);
+                if (msg != null) {
+                    tcpClient.tell(msg, ActorRef.noSender());
+                }
             }
         }
     }
     
-    private static Object parseCmd() {
-        Console console = System.console();
-        String cmd = console.readLine().trim();
-        String[] args = cmd.trim().split("\\s+");
+    private static Object parseCmd(Console console) {
+        String line = console.readLine();
+        String[] args = line.trim().split("\\s+");
         if (args.length != 3) {
-            console.printf("Bad cmd: %s", cmd);
+            console.printf("Bad cmd: %s", line);
             return null;
         }
         
