@@ -39,8 +39,7 @@ public class TcpServer extends UntypedActor {
     private void startServer(int port) {
         final InetSocketAddress endpoint = new InetSocketAddress("localhost", port);
         final Object bindCmd = TcpMessage.bind(getSelf(), endpoint, 100);
-        Tcp.get(getContext().system())
-                .getManager()
+        Tcp.get(getContext().system()).manager()
                 .tell(bindCmd, getSelf());
     }
     

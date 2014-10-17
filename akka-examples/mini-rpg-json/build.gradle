@@ -11,9 +11,9 @@ sourceCompatibility = '1.8'
 // prefer. In this case NetBeans will not add these tasks but you may rely on
 // your own implementation.
 if (!hasProperty('mainClass')) {
-    ext.mainClass = 'com.github.zxh.akka.minirpg.server.Main'
+    ext.mainClass = 'com.github.zxh.akka.minirpg.server.ServerApp'
 }
-mainClass = 'com.github.zxh.akka.minirpg.server.Main'
+mainClass = 'com.github.zxh.akka.minirpg.server.ServerApp'
 
 repositories {
     mavenCentral()
