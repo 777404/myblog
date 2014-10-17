@@ -1,5 +1,6 @@
 package com.github.zxh.akka.minirpg.server;
 
+import com.github.zxh.akka.minirpg.message.MsgCodec;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.actor.UntypedActor;
@@ -39,7 +40,7 @@ public class TcpServer extends UntypedActor {
     private void startServer(int port) {
         final InetSocketAddress endpoint = new InetSocketAddress("localhost", port);
         final Object bindCmd = TcpMessage.bind(getSelf(), endpoint, 100);
-        Tcp.get(getContext().system()).manager()
+        Tcp.get(getContext().system()).getManager()
                 .tell(bindCmd, getSelf());
     }
     
