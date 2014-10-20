@@ -2,6 +2,8 @@ package com.github.zxh.akka.minirpg.server;
 
 import akka.actor.UntypedActor;
 import com.github.zxh.akka.minirpg.domain.Player;
+import com.github.zxh.akka.minirpg.message.AddExpRequest;
+import com.github.zxh.akka.minirpg.message.AddExpResponse;
 import com.github.zxh.akka.minirpg.message.CreatePlayerRequest;
 import com.github.zxh.akka.minirpg.message.CreatePlayerResponse;
 import com.github.zxh.akka.minirpg.message.LevelUpRequest;
@@ -22,7 +24,10 @@ public class MsgHandler extends UntypedActor {
         if (msg instanceof CreatePlayerRequest) {
             int newPlayerId = createPlayer((CreatePlayerRequest) msg);
             getSender().tell(new CreatePlayerResponse(newPlayerId), getSelf());
-        } if (msg instanceof LevelUpRequest) {
+        } else if (msg instanceof AddExpRequest) {
+            int newExp = addExpToPlayer((AddExpRequest) msg);
+            getSender().tell(new AddExpResponse(newExp), getSelf());
+        } else if (msg instanceof LevelUpRequest) {
             int newLevel = levelUpPlayer((LevelUpRequest) msg);
             getSender().tell(new LevelUpResponse(newLevel), getSelf());
         }
@@ -36,6 +41,12 @@ public class MsgHandler extends UntypedActor {
         newPlayer.setName(req.getPlayerName());
         players.add(newPlayer);
         return playerId;
+    }
+    
+    private int addExpToPlayer(AddExpRequest req) {
+        Player player = players.get(req.getPlayerId());
+        player.addExp(req.getExp());
+        return player.getExp();
     }
     
     private int levelUpPlayer(LevelUpRequest req) {
