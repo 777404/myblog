@@ -2,10 +2,13 @@ package com.github.zxh.akka.minirpg.server;
 
 import akka.actor.UntypedActor;
 import com.github.zxh.akka.minirpg.domain.Player;
+import com.github.zxh.akka.minirpg.domain.PlayerInfo;
 import com.github.zxh.akka.minirpg.message.AddExpRequest;
 import com.github.zxh.akka.minirpg.message.AddExpResponse;
 import com.github.zxh.akka.minirpg.message.CreatePlayerRequest;
 import com.github.zxh.akka.minirpg.message.CreatePlayerResponse;
+import com.github.zxh.akka.minirpg.message.GetPlayerInfoRequest;
+import com.github.zxh.akka.minirpg.message.GetPlayerInfoResponse;
 import com.github.zxh.akka.minirpg.message.LevelUpRequest;
 import com.github.zxh.akka.minirpg.message.LevelUpResponse;
 import java.util.ArrayList;
@@ -30,6 +33,9 @@ public class MsgHandler extends UntypedActor {
         } else if (msg instanceof LevelUpRequest) {
             int newLevel = levelUpPlayer((LevelUpRequest) msg);
             getSender().tell(new LevelUpResponse(newLevel), getSelf());
+        } else if (msg instanceof GetPlayerInfoRequest) {
+            PlayerInfo playerInfo = getPlayerInfo((GetPlayerInfoRequest) msg);
+            getSender().tell(new GetPlayerInfoResponse(playerInfo), getSelf());
         }
     }
     
@@ -53,6 +59,12 @@ public class MsgHandler extends UntypedActor {
         Player player = players.get(req.getPlayerId());
         player.levelUp();
         return player.getLevel();
+    }
+    
+    private PlayerInfo getPlayerInfo(GetPlayerInfoRequest req) {
+        Player player = players.get(req.getPlayerId());
+        return new PlayerInfo(player.getId(), player.getName(),
+                player.getExp(), player.getLevel());
     }
     
 }

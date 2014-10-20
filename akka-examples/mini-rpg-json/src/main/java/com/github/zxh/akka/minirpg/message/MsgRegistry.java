@@ -10,6 +10,12 @@ public class MsgRegistry {
     static {
         register(1, CreatePlayerRequest.class);
         register(2, CreatePlayerResponse.class);
+        register(3, AddExpRequest.class);
+        register(4, AddExpResponse.class);
+        register(5, LevelUpRequest.class);
+        register(6, LevelUpResponse.class);
+        register(7, GetPlayerInfoRequest.class);
+        register(8, GetPlayerInfoResponse.class);
     }
     
     private static void register(int msgId, Class<?> msgClass) {
