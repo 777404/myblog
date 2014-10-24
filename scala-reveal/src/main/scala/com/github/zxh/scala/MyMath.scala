@@ -1,25 +1,32 @@
 package com.github.zxh.scala
 
-// Singleton Object
+class MyMath {
+    def foo = {}
+    def bar = {}
+}
+
 object MyMath {
 
     val PI = 3.14
 
-    def randomInt() = {
-        new java.util.Random().nextInt()
+    def abs(a: Int): Int = {
+        if (a < 0) -a else a
     }
     
 }
 
-object Test {
+object MyMathTest {
 
     def main(args: Array[String]) {
-        println(MyMath.PI)
+        println("PI is " + MyMath.PI)
+        val x = -18
+        val y = MyMath.abs(x)
     }
 
 }
 
 /*
+
 public final class MyMath$ {
     
     public static final MyMath$ MODULE$;
@@ -38,8 +45,8 @@ public final class MyMath$ {
         return this.PI;
     }
 
-    public int randomInt() {
-        return new java.util.Random().nextInt();
+    public int abs(int a) {
+        return return (a < 0) ? -a : a;
     }
 
 }
@@ -50,8 +57,8 @@ public final class MyMath {
         return MyMath$.MODULE$.PI();
     }
 
-    public static int randomInt() {
-        return MyMath$.MODULE$.randomInt();
+    public static int abs(int a) {
+        return MyMath$.MODULE$.abs(a);
     }
 
 }
