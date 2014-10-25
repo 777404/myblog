@@ -13,7 +13,7 @@ apply plugin: 'scala'
 if (!hasProperty('mainClass')) {
     ext.mainClass = ''
 }
-mainClass = 'com.github.zxh.scala.MyMathTest'
+mainClass = 'com.github.zxh.scala.PMTest'
 
 repositories {
     mavenCentral()
