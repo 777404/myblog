@@ -34,12 +34,25 @@ class Patterns {
 }
 
 
+class CCTest {
+
+    def copy1 = {
+        val cc = CC(1, 2)
+        cc.copy()
+    }
+
+    def copy2 = {
+        val cc = CC(1, 2)
+        cc.copy(x = 3)
+    }
+
+}
+
 object PMTest {
 
     def main(args: Array[String]) {
-        val cc = CC
-
-        cc(1, 2)
+        val cc = CC(1, 2)
+        val dd = cc.copy(x = 4)
         //println(cc)
     }
 
@@ -77,6 +90,12 @@ public class CC implements scala.Product, scala.Serializable {
     public CC copy(int x, int y) {
         return new CC(x, y);
     }
+    public int copy$default$1() {
+        return x();
+    }
+    public int copy$default$2() {
+        return y();
+    }
 
     // Product
     // def productArity: Int
@@ -113,7 +132,7 @@ public class CC implements scala.Product, scala.Serializable {
     public scala.Function1 static curried() {
         return CC$.MODULE$.curried();
     }
-    
+
 }
 
 public final class CC$ extends scala.runtime.AbstractFunction2 
