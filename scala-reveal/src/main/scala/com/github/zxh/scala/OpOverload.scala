@@ -23,12 +23,16 @@ class Operators {
 
 }
 
-class MyInt(x: Int) {
+class MyInt(val x: Int) {
 
     def +(y: Int) = new MyInt(x + y)
     def -(y: Int) = new MyInt(x - y)
     def +++(y: Int) = new MyInt(x + y * 3)
     def +:(y: Int) = new MyInt(x + y)
+    def unary_+ = this
+    def unary_- = new MyInt(-x)
+    def unary_~ = new MyInt(~x)
+    def unary_! = new MyInt(100 - x)
 
 }
 
@@ -42,9 +46,9 @@ class Pair(arr: Array[Int]) {
 object OpTest {
     
     def main(args: Array[String]) {
-        val xy = new Pair(Array(3, 7))
-        println(xy(0)) // 100
-        println(xy(1)) // 101
+        val myInt = new MyInt(1)
+        println(myInt.x)
+        println((~myInt).x)
     }
 
 }

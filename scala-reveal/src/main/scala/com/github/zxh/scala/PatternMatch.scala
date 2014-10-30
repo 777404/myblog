@@ -4,6 +4,12 @@ case class CC(x: Int, y: Int)
 
 class Patterns {
 
+    def sc(arg: Int) = {
+        // switch (arg) {
+        //     case 1 => println(1)
+        // }
+    }
+
     def wildcard(arg: Any) = arg match {
         case _ => 
     } 
@@ -26,24 +32,9 @@ class Patterns {
     }
 
     def constructor(arg: Any): Int = arg match {
-        case CC(1, 2) => 2
-        case CC(x, 2) => 3
-        case CC(x, y) => 4
-    }
-
-}
-
-
-class CCTest {
-
-    def copy1 = {
-        val cc = CC(1, 2)
-        cc.copy()
-    }
-
-    def copy2 = {
-        val cc = CC(1, 2)
-        cc.copy(x = 3)
+        case CC(1, 2) => 3
+        case CC(x, 4) => x + 5
+        case CC(x, y) => x + y
     }
 
 }
@@ -51,8 +42,13 @@ class CCTest {
 object PMTest {
 
     def main(args: Array[String]) {
-        val cc = CC(1, 2)
-        val dd = cc.copy(x = 4)
+
+        val out = System.out
+        out.println("hello")
+        out println "hello" 
+
+        //val cc = CC(1, 2)
+        //val dd = cc.copy(x = 4)
         //println(cc)
     }
 
