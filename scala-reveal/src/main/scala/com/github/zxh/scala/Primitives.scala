@@ -101,4 +101,8 @@ class Primitives {
     return (byte) x;
     */
 
+    def testAny(a: Any) = {
+
+    }
+
 }
