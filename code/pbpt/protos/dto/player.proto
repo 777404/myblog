@@ -1,0 +1,8 @@
+option java_package = "com.github.zxh.pbpt.protos.dto";
+
+message PlayerDto {
+    required uint32 id    = 1;
+    required uint32 exp   = 2;
+    required uint32 level = 3;
+    required string name  = 4;
+}

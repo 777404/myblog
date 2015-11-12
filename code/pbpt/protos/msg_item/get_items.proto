@@ -1,0 +1,11 @@
+option java_package = "com.github.zxh.pbpt.protos.msg.item";
+
+import "dto/item.proto";
+
+message GetItemsRequest {
+    // empty
+}
+
+message GetItemsResponse {
+    repeated ItemDto item = 1;
+}

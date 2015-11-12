@@ -1,0 +1,11 @@
+option java_package = "com.github.zxh.pbpt.protos.msg.player";
+
+import "dto/player.proto";
+
+message GetPlayerRequest {
+    required uint32 id = 1;
+}
+
+message GetPlayerResponse {
+    required PlayerDto player = 1;
+}

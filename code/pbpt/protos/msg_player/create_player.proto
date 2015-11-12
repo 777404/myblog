@@ -1,0 +1,9 @@
+option java_package = "com.github.zxh.pbpt.protos.msg.player";
+
+message CreatePlayerRequest {
+    required string name = 1;
+}
+
+message CreatePlayerResponse {
+    required uint32 id = 2;
+}
