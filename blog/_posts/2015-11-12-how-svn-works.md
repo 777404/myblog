@@ -20,7 +20,7 @@ date:   2015-11-12
 ***
 # 服务器
 
-{% include_relative how-svn-works/server/repo-structure.md %}
+{% include_relative how-svn-works/server/01-repo-structure.md %}
 
 ***
 # 客户端
