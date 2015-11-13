@@ -30,6 +30,8 @@ how-svn-works
       |-README.txt
 ```
 
+### repository内容
+
 README.txt告诉我们myrepo是一个svn repository，不要直接修改这个目录里面的文件，否则可能会把它搞坏！
 > This is a Subversion repository; use the 'svnadmin' and 'svnlook' 
 > tools to examine it.  Do not add, delete, or modify files here 
@@ -44,8 +46,12 @@ format文件里放的是repository的版本号，这个版本号规定了reposit
 * 版本号4只在开发中用过，从未正式使用
 * 版本号5是svn1.4引入的，一直使用到现在（1.9）
 
-因为我的svn版本号是1.8，所以format里放的是数字5。
+因为我用的是的svn1.8，所以format文件里放的是数字5。
 注意，db目录下也有一个format文件，但里面放的是svn文件系统的版本号（后面会介绍），千万不要把这两个版本号搞混了。
 关于这两个format文件区别的详细回答，请参考[这个问题](http://serverfault.com/questions/277441/difference-between-the-format-and-db-format-files-in-a-subversion-repository)。
 
+locks
+hooks
+conf
+db
 
