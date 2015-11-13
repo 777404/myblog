@@ -8,3 +8,5 @@ date:   2015-11-12
 
 * 服务器篇
 * 客户端篇
+
+{% include_relative how-svn-works/server/repo-structure.md %}
