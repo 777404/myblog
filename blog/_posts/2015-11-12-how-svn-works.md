@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "HOW SVN WORKS ?"
+title:  "SVN是如何工作的？"
 date:   2015-11-12
 ---
 
