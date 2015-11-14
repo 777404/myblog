@@ -7,7 +7,7 @@ svn软件分客户端和服务器两部分，相应的，svn管理的文件也�
 我们先创建下面这样一个目录结构，以方便后面的讨论。
 
 ```
-how-svn-works
+how-svn-works/
   |-client/
   |-server/
 ```
@@ -18,7 +18,7 @@ how-svn-works
 命令执行完之后，server目录便下会出现一个叫做myrepo的目录结构，如下所示：
 
 ```
-how-svn-works
+how-svn-works/
   |-client/
   |-server/
     |-myrepo/
