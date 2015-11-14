@@ -50,8 +50,11 @@ format文件里放的是repository的版本号，这个版本号规定了reposit
 注意，db目录下也有一个format文件，但里面放的是svn文件系统的版本号（后面会介绍），千万不要把这两个版本号搞混了。
 关于这两个format文件区别的详细回答，请参考[这个问题](http://serverfault.com/questions/277441/difference-between-the-format-and-db-format-files-in-a-subversion-repository)。
 
-locks
-hooks
-conf
-db
+locks目录下有两个文件，db.lock和db-logs.lock。
+这个目录是为了兼容svn1.2或更老的版本才放在这里的，从svn1.3开始就没用了。
+两个lock文件的内容一模一样：
+> This file is not used by Subversion 1.3.x or later.
+> However, its existence is required for compatibility with
+> Subversion 1.2.x or earlier.
 
+hooks目录里放的是hook脚本模版，conf目录里主要放的是svnserve相关的配置文件，我们暂时先不讨论这两个目录。
