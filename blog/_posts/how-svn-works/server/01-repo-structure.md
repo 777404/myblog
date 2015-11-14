@@ -30,7 +30,7 @@ how-svn-works/
       |-README.txt
 ```
 
-### repository内容
+### Repository内容
 
 README.txt告诉我们myrepo是一个svn repository，不要直接修改这个目录里面的文件，否则可能会把它搞坏！
 > This is a Subversion repository; use the 'svnadmin' and 'svnlook' 
@@ -59,7 +59,7 @@ locks目录下有两个文件，db.lock和db-logs.lock。
 
 hooks目录里放的是hook脚本模版，conf目录里主要放的是svnserve相关的配置文件，我们暂时先不讨论这两个目录。
 
-### db目录结构
+### Repository文件系统
 
 myrepo里还剩下一个目录没有介绍，db，我们展开来看一下这个目录。
 
@@ -80,8 +80,6 @@ myrepo/
     |-uuid
     |-write-lock
 ```
-
-### 文件系统
 
 操作系统使用文件系统（File System）来存放文件和目录，于此类似，svn也有自己的文件系统。
 本文后面提到的文件系统，在没有特殊说明的情况下，均指svn reposotiry filesystem，请不要把它和操作系统文件系统搞混。
