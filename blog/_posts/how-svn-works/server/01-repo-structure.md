@@ -81,7 +81,7 @@ myrepo/
     |-write-lock
 ```
 
-操作系统使用文件系统（File System）来存放文件和目录，于此类似，svn也有自己的文件系统。
+操作系统使用文件系统（File System）来存放文件和目录，于此类似，svn使用自己的文件系统存放版本化数据（Versioned Data）。
 本文后面提到的文件系统，在没有特殊说明的情况下，均指svn reposotiry filesystem，请不要把它和操作系统文件系统搞混。
 
 svn文件系统是个抽象的概念，具体可以有不同的实现。
