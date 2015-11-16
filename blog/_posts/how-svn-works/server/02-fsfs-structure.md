@@ -16,7 +16,7 @@ layout sharded 1000
 
 6是FSFS格式号。格式号和可以理解它们的svn版本号的对应关系如下表所示，更详细的介绍请看[这里](http://serverfault.com/questions/277441/difference-between-the-format-and-db-format-files-in-a-subversion-repository)和[这里](http://svn.apache.org/repos/asf/subversion/trunk/subversion/libsvn_fs_fs/structure)。
 
-| FSFS格式号 | svn版本号 |
+| FSFS格式号 | svn版本号  |
 | --------- |:--------- |
 | 1         | 1.1+      |
 | 2         | 1.4+      |
@@ -26,7 +26,12 @@ layout sharded 1000
 | 6         | 1.8+      |
 | 7         | 1.9+      |
 
-fsfs.conf
+格式6只有一个layout选项，可选值是sharded或者linear。
+如果是sharded，后面还需要跟一个参数，表示每个shard里最多可以放多少个版本文件。
+后面介绍revs和revprops目录的时候，会进一步解释layout选项。
+格式7增加了一个addressing选项，可选值是physical或者logical。
+
+fsfs.conf是FSFS配置文件，
 min-unpacked-rev
 current
 uuid
