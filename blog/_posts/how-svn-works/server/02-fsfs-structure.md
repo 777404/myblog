@@ -6,6 +6,16 @@ FSFS是建立在OS文件系统之上的，因此db目录（和子目录）里放
 
 ### FSFS信息
 
+```
+myrepo/
+  |-db/
+    |-current
+    |-format
+    |-fsfs.conf
+    |-min-unpacked-rev
+    |-uuid
+```
+
 FSFS相关的一些信息分散在五个文件里。
 format文件里放的是FSFS格式号和选项，我们打开它看一下：
 
@@ -40,12 +50,22 @@ uuid文件里放的是repository的[UUID](https://en.wikipedia.org/wiki/Universa
 [这篇文章](http://tortoisesvn.net/logcacheuuids.html)介绍了TortoiseSVN的日志缓存和UUID是如何配合使用的。
 myrepo的UUID是`9f4743fc-0d7f-4055-924f-210f3cf9ed31`。
 
-current文件里放的是repository的当前版本号（revision）。
+current文件里放的是repository的当前版本号（revision number，后面简称revnum）。
 当前版本号从0开始，每一次提交都会导致该版本号加一。
 min-unpacked-rev文件指出，从哪个版本开始，版本文件还没有被pack。
 后面介绍shard packing的时候，会进一步解释这个文件。
 
 ### Transaction
+
+```
+myrepo/
+  |-db/
+    |-transactions/
+    |-txn-protorevs/
+    |-txn-current
+    |-txn-current-lock
+    |-write-lock
+```
 
 svn必须保证每次提交都是原子（Atomic）操作。
 比如说某次提交修改了3个文件，添加了1个文件，并且删除了2个文件。
@@ -59,17 +79,21 @@ txn-current文件里放的是下一次提交的txnid，刚开始的时候是0。
 每次提交开始的时候，svn服务器都会先锁住txn-current-lock文件，把里面的txnid加一，再解锁该文件。
 即使某次提交失败，也不会重复使用txnid。
 
-transactions/
-txn-protorevs/
-
-write-lock
 
 ### 版本数据
 
-revs
-
-revprops
+```
+myrepo/
+  |-db/
+    |-revprops/
+    |-revs/
+```
 
 ### svn锁
 
-locks
+
+```
+myrepo/
+  |-db/
+    |-locks/
+```
