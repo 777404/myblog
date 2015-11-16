@@ -79,6 +79,13 @@ txn-current文件里放的是下一次提交的txnid，刚开始的时候是0。
 每次提交开始的时候，svn服务器都会先锁住txn-current-lock文件，把里面的txnid加一，再解锁该文件。
 即使某次提交失败，也不会重复使用txnid。
 
+每次提交会在transactions目录下创建一个名叫${revnum}-${txnid}.txn的子目录，并在这个目录下创建一些文件。
+同时，还会在txn-protorevs目录下创建${revnum}-${txnid}.rev和${revnum}-${txnid}.rev-lock两个文件。
+比如revnum是3，txnid是x，那么transactions里创建的子目录就是3-x.txn，txn-protorevs里出现的两个文件分别是3-x.rev和3-x.rev-lock。
+这些目录和文件都是临时使用的，提交结束（无论成功与否）后就会被svn清理掉。
+它们的用处我们后面再详细讨论。
+
+write-lock
 
 ### 版本数据
 
