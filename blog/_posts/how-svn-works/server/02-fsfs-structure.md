@@ -42,8 +42,8 @@ myrepo的UUID是`9f4743fc-0d7f-4055-924f-210f3cf9ed31`。
 
 current文件里放的是repository的当前版本号（revision）。
 当前版本号从0开始，每一次提交都会导致该版本号加一。
-
-min-unpacked-rev
+min-unpacked-rev文件指出，从哪个版本开始，版本文件还没有被pack。
+后面介绍shard packing的时候，会进一步解释这个文件。
 
 ### Transaction
 
