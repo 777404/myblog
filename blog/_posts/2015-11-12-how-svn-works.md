@@ -8,7 +8,7 @@ date:   2015-11-12
 
 * 服务器篇
     * Repository目录结构
-    * Repository文件系统
+    * FSFS文件系统目录结构
 * 客户端篇
 
 ```

@@ -95,7 +95,7 @@ svn文件系统是个抽象的概念，具体可以有不同的实现。
 [svn1.8](https://subversion.apache.org/docs/release-notes/1.8.html#bdb-deprecated)
 给BDB打上了deprecated标签，会慢慢停止维护。
 [svn1.9](https://subversion.apache.org/docs/release-notes/1.9.html#fsx)
-引入了一个新的文件系统实现，叫做FSX，但是还不稳定，不建议用在生产环境中。
+引入了一个新的文件系统实现，叫做FSX，但是还不太稳定，不建议用在生产环境中。
 
 fs-type这个文件记录了repository用的是哪种类型的文件系统，可以打开看一下，里面写的是fsfs。
-下面我们详细讨论一下FSFS文件系统。
+下面我们详细讨论一下FSFS文件系统的目录结构。
