@@ -47,13 +47,20 @@ min-unpacked-rev文件指出，从哪个版本开始，版本文件还没有被p
 
 ### Transaction
 
+svn必须保证每次提交都是原子（Atomic）操作。
+比如说某次提交修改了3个文件，添加了1个文件，并且删除了2个文件。
+svn必须保证对这6个文件的改动要么全部生效，要么全部作废，否则版本库就会乱掉。
+为了强调这种原子性，svn把提交过程叫做transaction。
+
+svn会给每次提交（也就是每个transaction）分配一个唯一id，后面简称txnid。
+txnid是一个36进制整数（使用了0到9和a到z这36个字符），从0开始递增。
+txn-current文件里放的是下一次提交的txnid，刚开始的时候是0。
+换句话说，第一次提交的txnid是0。
+每次提交开始的时候，svn服务器都会先锁住txn-current-lock文件，把里面的txnid加一，再解锁该文件。
+即使某次提交失败，也不会重复使用txnid。
+
 transactions/
-
 txn-protorevs/
-
-txn-current
-
-txn-current-lock
 
 write-lock
 
