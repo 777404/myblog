@@ -39,15 +39,15 @@ README.txt告诉我们myrepo是一个svn repository，不要直接修改这个�
 >
 > Visit http://subversion.apache.org/ for more information.
 
-format文件里放的是repository的版本号，这个版本号规定了repository长什么样子。
+format文件里放的是repository的格式号，这个格式号规定了repository长什么样子。
 
-* 版本号0、1、2在svn1.0之前使用
-* 版本号3由svn1.0到1.3使用
-* 版本号4只在开发中用过，从未正式使用
-* 版本号5是svn1.4引入的，一直使用到现在（1.9）
+* 格式号0、1、2在svn1.0之前使用
+* 格式号3由svn1.0到1.3使用
+* 格式号4只在开发中用过，从未正式使用
+* 格式号5是svn1.4引入的，一直使用到现在（1.9）
 
 因为我用的是的svn1.8，所以format文件里放的是数字5。
-注意，db目录下也有一个format文件，但里面放的是svn文件系统的版本号（后面会介绍），千万不要把这两个版本号搞混了。
+注意，db目录下也有一个format文件，但里面放的是svn文件系统的格式号（后面会介绍），千万不要把这两个格式号搞混了。
 关于这两个format文件区别的详细回答，请参考[这个问题](http://serverfault.com/questions/277441/difference-between-the-format-and-db-format-files-in-a-subversion-repository)。
 
 locks目录下有两个文件，db.lock和db-logs.lock。
