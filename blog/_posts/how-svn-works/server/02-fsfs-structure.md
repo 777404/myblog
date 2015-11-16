@@ -31,10 +31,17 @@ layout sharded 1000
 后面介绍revs和revprops目录的时候，会进一步解释layout选项。
 格式7增加了一个addressing选项，可选值是physical或者logical。
 
-fsfs.conf是FSFS配置文件，
+fsfs.conf是FSFS配置文件，在里面可以配制缓存等选项。
+这个文件里有详细的注释，这里就不解释了。
+
+uuid文件里放的是repository的[UUID](https://en.wikipedia.org/wiki/Universally_unique_identifier)（Universally Unique IDentifier），这个UUID主要是提供给svn客户端使用的。
+可以使用`svnlook uuid`命令查看repository的UUID；使用`svnadmin setuuid`命令修改repository的UUID。
+关于UUID的更多介绍，请看[svnbook](http://svnbook.red-bean.com/en/1.8/svn.reposadmin.maint.html#svn.reposadmin.maint.uuids)。
+[这篇文章](http://tortoisesvn.net/logcacheuuids.html)介绍了TortoiseSVN的日志缓存和UUID是如何配合使用的。
+
 min-unpacked-rev
+
 current
-uuid
 
 ### Transaction
 
