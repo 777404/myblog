@@ -38,22 +38,31 @@ uuid文件里放的是repository的[UUID](https://en.wikipedia.org/wiki/Universa
 可以使用`svnlook uuid`命令查看repository的UUID；使用`svnadmin setuuid`命令修改repository的UUID。
 关于UUID的更多介绍，请看[svnbook](http://svnbook.red-bean.com/en/1.8/svn.reposadmin.maint.html#svn.reposadmin.maint.uuids)。
 [这篇文章](http://tortoisesvn.net/logcacheuuids.html)介绍了TortoiseSVN的日志缓存和UUID是如何配合使用的。
+myrepo的UUID是`9f4743fc-0d7f-4055-924f-210f3cf9ed31`。
+
+current文件里放的是repository的当前版本号（revision）。
+当前版本号从0开始，每一次提交都会导致该版本号加一。
 
 min-unpacked-rev
-
-current
 
 ### Transaction
 
 transactions/
+
 txn-protorevs/
+
 txn-current
+
 txn-current-lock
+
 write-lock
 
 ### 版本数据
+
 revs
+
 revprops
 
 ### svn锁
+
 locks
