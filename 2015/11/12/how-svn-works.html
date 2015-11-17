@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>SVN是如何工作的？</title>
+  <meta name="description" content="目录">
+
+  <link rel="stylesheet" href="/myblog/css/main.css">
+  <link rel="canonical" href="http://yourdomain.com/myblog/2015/11/12/how-svn-works.html">
+  <link rel="alternate" type="application/rss+xml" title="zxh的博客" href="http://yourdomain.com/myblog/feed.xml">
+</head>
+
+
+  <body>
+
+    <header class="site-header">
+
+  <div class="wrapper">
+
+    <a class="site-title" href="/myblog/">zxh的博客</a>
+
+    <nav class="site-nav">
+      <a href="#" class="menu-icon">
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+      </a>
+
+      <div class="trigger">
+        
+          
+          <a class="page-link" href="/myblog/about/">About</a>
+          
+        
+          
+        
+          
+        
+          
+        
+      </div>
+    </nav>
+
+  </div>
+
+</header>
+
+
+    <div class="page-content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">SVN是如何工作的？</h1>
+    <p class="post-meta"><time datetime="2015-11-12T00:00:00+08:00" itemprop="datePublished">Nov 12, 2015</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <h1 id="目录">目录</h1>
+
+<ul>
+<li>服务器篇
+
+<ul>
+<li>Repository目录结构</li>
+<li>FSFS文件系统目录结构</li>
+</ul></li>
+<li>客户端篇</li>
+</ul>
+<div class="highlight"><pre><code class="language-" data-lang="">提示：这篇文章并不是要介绍svn的用法，而是想探讨一下svn的内部工作原理。
+我的测试环境是：
+* Mac OS X 10.11
+* Subversion 1.8.13
+</code></pre></div>
+<hr>
+
+<h1 id="服务器">服务器</h1>
+
+<h2 id="repository目录结构">Repository目录结构</h2>
+
+<h3 id="创建测试目录">创建测试目录</h3>
+
+<p>svn软件分客户端和服务器两部分，相应的，svn管理的文件也分为两部分。
+由服务器管理的目录结构叫做repository，由客户端管理的目录结构叫做working copy。
+我们先创建下面这样一个目录结构，以方便后面的讨论。</p>
+<div class="highlight"><pre><code class="language-" data-lang="">how-svn-works/
+  |-client/
+  |-server/
+</code></pre></div>
+<h3 id="创建repository">创建repository</h3>
+
+<p><code>cd</code>到server目录，在这里执行<code>svnadmin create myrepo</code>命令创建一个repository。
+命令执行完之后，server目录便下会出现一个叫做myrepo的目录结构，如下所示：</p>
+<div class="highlight"><pre><code class="language-" data-lang="">how-svn-works/
+  |-client/
+  |-server/
+    |-myrepo/
+      |-conf/
+      |-db/
+      |-hooks/
+      |-locks/
+      |-format
+      |-README.txt
+</code></pre></div>
+<h3 id="repository内容">Repository内容</h3>
+
+<p>README.txt告诉我们myrepo是一个svn repository，不要直接修改这个目录里面的文件，否则可能会把它搞坏！</p>
+
+<blockquote>
+<p>This is a Subversion repository; use the &#39;svnadmin&#39; and &#39;svnlook&#39; 
+tools to examine it.  Do not add, delete, or modify files here 
+unless you know how to avoid corrupting the repository.</p>
+
+<p>Visit <a href="http://subversion.apache.org/">http://subversion.apache.org/</a> for more information.</p>
+</blockquote>
+
+<p>format文件里放的是repository的格式号，这个格式号规定了repository长什么样子。</p>
+
+<ul>
+<li>格式号0、1、2在svn1.0之前使用</li>
+<li>格式号3由svn1.0到1.3使用</li>
+<li>格式号4只在开发中用过，从未正式使用</li>
+<li>格式号5是svn1.4引入的，一直使用到现在（1.9）</li>
+</ul>
+
+<p>因为我用的是的svn1.8，所以format文件里放的是数字5。
+注意，db目录下也有一个format文件，但里面放的是svn文件系统的格式号（后面会介绍），千万不要把这两个格式号搞混了。
+关于这两个format文件区别的详细回答，请参考<a href="http://serverfault.com/questions/277441/difference-between-the-format-and-db-format-files-in-a-subversion-repository">这个问题</a>。</p>
+
+<p>locks目录下有两个文件，db.lock和db-logs.lock。
+这个目录是为了兼容svn1.2或更老的版本才放在这里的，从svn1.3开始就没用了。
+两个lock文件的内容一模一样：</p>
+
+<blockquote>
+<p>This file is not used by Subversion 1.3.x or later.
+However, its existence is required for compatibility with
+Subversion 1.2.x or earlier.</p>
+</blockquote>
+
+<p>hooks目录里放的是hook脚本模版，conf目录里主要放的是svnserve相关的配置文件，我们暂时先不讨论这两个目录。</p>
+
+<h3 id="repository文件系统">Repository文件系统</h3>
+
+<p>myrepo里还剩下一个目录没有介绍，db，我们展开来看一下这个目录。</p>
+<div class="highlight"><pre><code class="language-" data-lang="">myrepo/
+  |-db/
+    |-revprops/
+    |-revs/
+    |-transactions/
+    |-txn-protorevs/
+    |-current
+    |-format
+    |-fs-type
+    |-fsfs.conf
+    |-min-unpacked-rev
+    |-txn-current
+    |-txn-current-lock
+    |-uuid
+    |-write-lock
+</code></pre></div>
+<p>操作系统使用文件系统（File System）来存放文件和目录，于此类似，svn使用自己的文件系统存放版本化数据（Versioned Data）。
+本文后面提到的文件系统，在没有特殊说明的情况下，均指svn reposotiry filesystem，请不要把它和操作系统文件系统搞混。</p>
+
+<p>svn文件系统是个抽象的概念，具体可以有不同的实现。
+最开始的时候，文件系统是用Berkeley DB实现的，简写做BDB。
+<a href="https://subversion.apache.org/docs/release-notes/1.1.html">svn1.1</a>
+实现了一个新的文件系统，这个实现不是基于数据库的，而是直接使用操作系统的文件系统，所以简写成FSFS。
+<a href="https://subversion.apache.org/docs/release-notes/1.2.html#fsfs">svn1.2</a>
+把FSFS变成了默认的文件系统实现。
+也就是说，在使用<code>svnadmin create</code>命令创建repository的时候，默认创建出来的就是FSFS类型的repository。
+可以加上<code>--fs-type bdb</code>选项来创建BDB类型的repository。
+<a href="https://subversion.apache.org/docs/release-notes/1.8.html#bdb-deprecated">svn1.8</a>
+给BDB打上了deprecated标签，会慢慢停止维护。
+<a href="https://subversion.apache.org/docs/release-notes/1.9.html#fsx">svn1.9</a>
+引入了一个新的文件系统实现，叫做FSX，但是还不太稳定，不建议用在生产环境中。</p>
+
+<p>fs-type这个文件记录了repository用的是哪种类型的文件系统，可以打开看一下，里面写的是fsfs。
+下面我们详细讨论一下FSFS文件系统的目录结构。</p>
+
+<h2 id="fsfs文件系统目录结构">FSFS文件系统目录结构</h2>
+
+<p>FSFS是建立在OS文件系统之上的，因此db目录（和子目录）里放的都是普通的文件。
+这些文件大部分都可以用文本编辑器打开，但千万不要直接编辑！
+按照相关性，子目录和文件大致可以分为四类，下面进行介绍。</p>
+
+<h3 id="fsfs信息">FSFS信息</h3>
+<div class="highlight"><pre><code class="language-" data-lang="">myrepo/
+  |-db/
+    |-current
+    |-format
+    |-fsfs.conf
+    |-min-unpacked-rev
+    |-uuid
+</code></pre></div>
+<p>FSFS相关的一些信息分散在五个文件里。
+format文件里放的是FSFS格式号和选项，我们打开它看一下：</p>
+<div class="highlight"><pre><code class="language-" data-lang="">6
+layout sharded 1000
+</code></pre></div>
+<p>6是FSFS格式号。格式号和可以理解它们的svn版本号的对应关系如下表所示，更详细的介绍请看<a href="http://serverfault.com/questions/277441/difference-between-the-format-and-db-format-files-in-a-subversion-repository">这里</a>和<a href="http://svn.apache.org/repos/asf/subversion/trunk/subversion/libsvn_fs_fs/structure">这里</a>。</p>
+
+<table><thead>
+<tr>
+<th>FSFS格式号</th>
+<th style="text-align: left">svn版本号</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>1</td>
+<td style="text-align: left">1.1+</td>
+</tr>
+<tr>
+<td>2</td>
+<td style="text-align: left">1.4+</td>
+</tr>
+<tr>
+<td>3</td>
+<td style="text-align: left">1.5+</td>
+</tr>
+<tr>
+<td>4</td>
+<td style="text-align: left">1.6+</td>
+</tr>
+<tr>
+<td>5</td>
+<td style="text-align: left">1.7-dev</td>
+</tr>
+<tr>
+<td>6</td>
+<td style="text-align: left">1.8+</td>
+</tr>
+<tr>
+<td>7</td>
+<td style="text-align: left">1.9+</td>
+</tr>
+</tbody></table>
+
+<p>格式6只有一个layout选项，可选值是sharded或者linear。
+如果是sharded，后面还需要跟一个参数，表示每个shard里最多可以放多少个版本文件。
+后面介绍revs和revprops目录的时候，会进一步解释layout选项。
+格式7增加了一个addressing选项，可选值是physical或者logical。</p>
+
+<p>fsfs.conf是FSFS配置文件，在里面可以配制缓存等选项。
+这个文件里有详细的注释，这里就不解释了。</p>
+
+<p>uuid文件里放的是repository的<a href="https://en.wikipedia.org/wiki/Universally_unique_identifier">UUID</a>（Universally Unique IDentifier），这个UUID主要是提供给svn客户端使用的。
+可以使用<code>svnlook uuid</code>命令查看repository的UUID；使用<code>svnadmin setuuid</code>命令修改repository的UUID。
+关于UUID的更多介绍，请看<a href="http://svnbook.red-bean.com/en/1.8/svn.reposadmin.maint.html#svn.reposadmin.maint.uuids">svnbook</a>。
+<a href="http://tortoisesvn.net/logcacheuuids.html">这篇文章</a>介绍了TortoiseSVN的日志缓存和UUID是如何配合使用的。
+myrepo的UUID是<code>9f4743fc-0d7f-4055-924f-210f3cf9ed31</code>。</p>
+
+<p>current文件里放的是repository的当前版本号（revision number，后面简称revnum）。
+当前版本号从0开始，每一次提交都会导致该版本号加一。
+min-unpacked-rev文件指出，从哪个版本开始，版本文件还没有被pack。
+后面介绍shard packing的时候，会进一步解释这个文件。</p>
+
+<h3 id="transaction">Transaction</h3>
+<div class="highlight"><pre><code class="language-" data-lang="">myrepo/
+  |-db/
+    |-transactions/
+    |-txn-protorevs/
+    |-txn-current
+    |-txn-current-lock
+    |-write-lock
+</code></pre></div>
+<p>svn必须保证每次提交都是原子（Atomic）操作。
+比如说某次提交修改了3个文件，添加了1个文件，并且删除了2个文件。
+svn必须保证对这6个文件的改动要么全部生效，要么全部作废，否则版本库就会乱掉。
+为了强调这种原子性，svn把提交过程叫做transaction。</p>
+
+<p>svn会给每次提交（也就是每个transaction）分配一个唯一id，后面简称txnid。
+txnid是一个36进制整数（使用了0到9和a到z这36个字符），从0开始递增。
+txn-current文件里放的是下一次提交的txnid，刚开始的时候是0。
+换句话说，第一次提交的txnid是0。
+每次提交开始的时候，svn服务器都会先锁住txn-current-lock文件，把里面的txnid加一，再解锁该文件。
+即使某次提交失败，也不会重复使用txnid。</p>
+
+<p>每次提交会在transactions目录下创建一个名叫${revnum}-${txnid}.txn的子目录，并在这个子目录里创建一些文件。
+同时，还会在txn-protorevs目录下创建${revnum}-${txnid}.rev和${revnum}-${txnid}.rev-lock两个文件。
+假设提交开始前revnum（在current文件里）是3，txnid（在txn-current文件里）是x，那么transactions里创建的子目录就是3-x.txn，txn-protorevs里出现的两个文件分别是3-x.rev和3-x.rev-lock。
+这些目录和文件都是临时使用的，提交结束（无论成功与否）后就会被svn清理掉。
+它们的用处我们后面再详细讨论。</p>
+
+<p>如果提交可以顺利完成，svn会在revs和revprops目录下各生成一个版本文件，然后修改current文件，把当前版本号加一。
+很显然，虽然多个客户端可以同时发起提交，但是最后这一步必须串行进行，否则就会出问题。
+这个串行是由write-lock文件保证的。
+svn服务器必须先锁住这个文件，完成提交，然后解锁这个文件。</p>
+
+<h3 id="版本数据">版本数据</h3>
+<div class="highlight"><pre><code class="language-" data-lang="">myrepo/
+  |-db/
+    |-revprops/
+      |-0/
+        |-0
+    |-revs/
+      |-0/
+        |-0
+</code></pre></div>
+<p>svn在自己的文件系统里存放的是增量数据，也就是版本之间的差异。
+每次成功提交都会生成两个文件，文件名就是版本号，没有后缀。
+一个文件记录和上一个版本的差异，放在revs目录里。
+另一个是属性文件，记录提交日期、注释等信息，放在revprops目录里。
+具体的文件内容将在后面介绍。</p>
+
+<p>在格式3（svn1.5）之前，这些文件是直接放在各自目录下面的。
+<a href="http://subversion.apache.org/docs/release-notes/1.5.html#fsfs-sharding">svn1.5</a>进行了优化，引入了分区机制。
+format文件里的layout选项指出是否启用分区，sharded表示启用，linear表示不启用。
+启用分区之后，版本文件会分文件夹放置。
+分区文件夹从0开始编号，一个满了再用另一个。
+因为我们的layout选项是<code>sharded 1000</code>，还没有进行提交，所以db目录长上面那个样子。
+注意，版本0是创建repository的时候自动生成的。
+假设已经进行了1000次提交，那么这时db目录应该是下面这样：</p>
+<div class="highlight"><pre><code class="language-" data-lang="">myrepo/
+  |-db/
+    |-revprops/
+      |-0/
+        |-0
+          ...
+        |-999
+      |-1/
+        |-1000
+    |-revs/
+      |-0/
+        |-0
+          ...
+        |999
+      |-1/
+        |1000
+</code></pre></div>
+<hr>
+
+<h1 id="客户端">客户端</h1>
+
+  </div>
+
+</article>
+
+      </div>
+    </div>
+
+    <footer class="site-footer">
+
+  <div class="wrapper">
+
+    <h2 class="footer-heading">zxh的博客</h2>
+
+    <div class="footer-col-wrapper">
+      <div class="footer-col footer-col-1">
+        <ul class="contact-list">
+          <li>zxh的博客</li>
+          <li><a href="mailto:"></a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-2">
+        <ul class="social-media-list">
+          
+          <li>
+            <a href="https://github.com/zxh0"><span class="icon icon--github"><svg viewBox="0 0 16 16"><path fill="#828282" d="M7.999,0.431c-4.285,0-7.76,3.474-7.76,7.761 c0,3.428,2.223,6.337,5.307,7.363c0.388,0.071,0.53-0.168,0.53-0.374c0-0.184-0.007-0.672-0.01-1.32 c-2.159,0.469-2.614-1.04-2.614-1.04c-0.353-0.896-0.862-1.135-0.862-1.135c-0.705-0.481,0.053-0.472,0.053-0.472 c0.779,0.055,1.189,0.8,1.189,0.8c0.692,1.186,1.816,0.843,2.258,0.645c0.071-0.502,0.271-0.843,0.493-1.037 C4.86,11.425,3.049,10.76,3.049,7.786c0-0.847,0.302-1.54,0.799-2.082C3.768,5.507,3.501,4.718,3.924,3.65 c0,0,0.652-0.209,2.134,0.796C6.677,4.273,7.34,4.187,8,4.184c0.659,0.003,1.323,0.089,1.943,0.261 c1.482-1.004,2.132-0.796,2.132-0.796c0.423,1.068,0.157,1.857,0.077,2.054c0.497,0.542,0.798,1.235,0.798,2.082 c0,2.981-1.814,3.637-3.543,3.829c0.279,0.24,0.527,0.713,0.527,1.437c0,1.037-0.01,1.874-0.01,2.129 c0,0.208,0.14,0.449,0.534,0.373c3.081-1.028,5.302-3.935,5.302-7.362C15.76,3.906,12.285,0.431,7.999,0.431z"/></svg>
+</span><span class="username">zxh0</span></a>
+
+          </li>
+          
+
+          
+        </ul>
+      </div>
+
+      <div class="footer-col footer-col-3">
+        <p>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.
+</p>
+      </div>
+    </div>
+
+  </div>
+
+</footer>
+
+
+  </body>
+
+</html>
