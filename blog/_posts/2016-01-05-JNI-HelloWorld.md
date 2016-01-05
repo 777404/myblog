@@ -22,7 +22,7 @@ public class HelloWorld {
 ```
 
 
-```sh
+```shell
 javac HelloWorld.java
 javah -jni HelloWorld
 ```
@@ -56,15 +56,28 @@ JNIEXPORT void JNICALL Java_HelloWorld_print
 
 ```cpp
 #include <jni.h>
-#include <iostream>
+#include <stdio.h>
 #include "HelloWorld.h"
-using namespace std;
  
 JNIEXPORT void JNICALL 
-Java_HelloWorld_print(JNIEnv *, jobject){
-    cout << "Oh JNI, how cumbersome you are!\n";
+Java_HelloWorld_print(JNIEnv *env, jobject o) {
+    printf("Hello, World!\n");
     return;
 }
+```
+
+```shell
+gcc "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include" \
+    "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include/darwin" \
+    -c HelloWorld.c
+```
+
+```shell
+gcc -dynamiclib -o libhelloworld.dylib HelloWorld.o
+```
+
+```shell
+java HelloWorld
 ```
 
 
