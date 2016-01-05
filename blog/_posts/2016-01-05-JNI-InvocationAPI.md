@@ -64,7 +64,7 @@ gcc "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include" 
 ```
 
 # 第3步
-把[HelloWorld.class和libHelloWorld.dylib]({% post_url 2016-01-05-JNI-HelloWorld %})
+把[HelloWorld.class和libHelloWorld.dylib](jni-helloworld.html)
 拷贝到当前目录，然后运行LoadJVM：
 
 ```shell
