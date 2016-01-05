@@ -6,7 +6,7 @@
 void loadJVM();
 
 int main() {
-    testJVM();
+    loadJVM();
     return 0;
 }
 
@@ -32,12 +32,20 @@ void loadJVM() {
     (*jvm)->DestroyJavaVM(jvm);
 }
 
-// export C_INCLUDE_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include:/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include/darwin
-// export LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/server
-// export LD_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/server/
+/*
+gcc "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include" \
+    "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include/darwin" \
+    "-L/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/server" \
+    -o LoadJVM LoadJVM.c -ljvm
 
-// gcc InvocationTest.c -o JvmTest
+export LD_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/server/
+*/
+// 您需要安装旧 Java SE 6 运行环境才能打开“此 Java 应用程序”。
+/*
+gcc "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include" \
+    "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include/darwin" \
+    "-L/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/jli" \
+    -o LoadJVM LoadJVM.c -ljli
 
-
-// gcc -L/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/server -o JvmTest InvocationTest.c -ljvm
-
+export LD_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/jli/
+*/
