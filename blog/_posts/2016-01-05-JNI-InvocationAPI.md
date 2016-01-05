@@ -64,7 +64,8 @@ gcc "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include" 
 ```
 
 # 第3步
-把HelloWorld.class和libHelloWorld.dylib拷贝到当前目录，然后运行LoadJVM：
+把[HelloWorld.class和libHelloWorld.dylib]({% post_url 2016-01-05-JNI-HelloWorld %})
+拷贝到当前目录，然后运行LoadJVM：
 
 ```shell
 export LD_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/server/
@@ -84,6 +85,8 @@ gcc "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include" 
     "-L/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/jli" \
     -o LoadJVM LoadJVM.c -ljli
 ```
+
+注意：区别在于不使用libjvm.dylib而是使用libjli.dylib。
 
 # 第5步
 重新运行LoadJVM：
