@@ -13,5 +13,5 @@ gcc "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include" 
     "-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include/darwin" \
     -c HelloWorld.c
 
-gcc -dynamiclib -o libhelloworld.dylib HelloWorld.o
+gcc -dynamiclib -o libHelloWorld.dylib HelloWorld.o
 */
