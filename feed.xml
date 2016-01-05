@@ -6,290 +6,101 @@
 </description>
     <link>http://yourdomain.com/myblog/</link>
     <atom:link href="http://yourdomain.com/myblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 17 Nov 2015 16:44:26 +0800</pubDate>
-    <lastBuildDate>Tue, 17 Nov 2015 16:44:26 +0800</lastBuildDate>
+    <pubDate>Tue, 05 Jan 2016 14:21:31 +0800</pubDate>
+    <lastBuildDate>Tue, 05 Jan 2016 14:21:31 +0800</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
-        <title>SVN是如何工作的？</title>
-        <description>&lt;h1 id=&quot;目录&quot;&gt;目录&lt;/h1&gt;
+        <title>JNI笔记之一：Hello，World！</title>
+        <description>&lt;h1 id=&quot;测试环境&quot;&gt;测试环境&lt;/h1&gt;
 
 &lt;ul&gt;
-&lt;li&gt;服务器篇
-
-&lt;ul&gt;
-&lt;li&gt;Repository目录结构&lt;/li&gt;
-&lt;li&gt;FSFS文件系统目录结构&lt;/li&gt;
-&lt;/ul&gt;&lt;/li&gt;
-&lt;li&gt;客户端篇&lt;/li&gt;
-&lt;/ul&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;提示：这篇文章并不是要介绍svn的用法，而是想探讨一下svn的内部工作原理。
-我的测试环境是：
-* Mac OS X 10.11
-* Subversion 1.8.13
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;hr&gt;
-
-&lt;h1 id=&quot;服务器&quot;&gt;服务器&lt;/h1&gt;
-
-&lt;h2 id=&quot;repository目录结构&quot;&gt;Repository目录结构&lt;/h2&gt;
-
-&lt;h3 id=&quot;创建测试目录&quot;&gt;创建测试目录&lt;/h3&gt;
-
-&lt;p&gt;svn软件分客户端和服务器两部分，相应的，svn管理的文件也分为两部分。
-由服务器管理的目录结构叫做repository，由客户端管理的目录结构叫做working copy。
-我们先创建下面这样一个目录结构，以方便后面的讨论。&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;how-svn-works/
-  |-client/
-  |-server/
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3 id=&quot;创建repository&quot;&gt;创建repository&lt;/h3&gt;
-
-&lt;p&gt;&lt;code&gt;cd&lt;/code&gt;到server目录，在这里执行&lt;code&gt;svnadmin create myrepo&lt;/code&gt;命令创建一个repository。
-命令执行完之后，server目录便下会出现一个叫做myrepo的目录结构，如下所示：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;how-svn-works/
-  |-client/
-  |-server/
-    |-myrepo/
-      |-conf/
-      |-db/
-      |-hooks/
-      |-locks/
-      |-format
-      |-README.txt
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;h3 id=&quot;repository内容&quot;&gt;Repository内容&lt;/h3&gt;
-
-&lt;p&gt;README.txt告诉我们myrepo是一个svn repository，不要直接修改这个目录里面的文件，否则可能会把它搞坏！&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;This is a Subversion repository; use the &amp;#39;svnadmin&amp;#39; and &amp;#39;svnlook&amp;#39; 
-tools to examine it.  Do not add, delete, or modify files here 
-unless you know how to avoid corrupting the repository.&lt;/p&gt;
-
-&lt;p&gt;Visit &lt;a href=&quot;http://subversion.apache.org/&quot;&gt;http://subversion.apache.org/&lt;/a&gt; for more information.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;format文件里放的是repository的格式号，这个格式号规定了repository长什么样子。&lt;/p&gt;
-
-&lt;ul&gt;
-&lt;li&gt;格式号0、1、2在svn1.0之前使用&lt;/li&gt;
-&lt;li&gt;格式号3由svn1.0到1.3使用&lt;/li&gt;
-&lt;li&gt;格式号4只在开发中用过，从未正式使用&lt;/li&gt;
-&lt;li&gt;格式号5是svn1.4引入的，一直使用到现在（1.9）&lt;/li&gt;
+&lt;li&gt;Mac OS X 10.11&lt;/li&gt;
+&lt;li&gt;JDK 1.8.0_60&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;因为我用的是的svn1.8，所以format文件里放的是数字5。
-注意，db目录下也有一个format文件，但里面放的是svn文件系统的格式号（后面会介绍），千万不要把这两个格式号搞混了。
-关于这两个format文件区别的详细回答，请参考&lt;a href=&quot;http://serverfault.com/questions/277441/difference-between-the-format-and-db-format-files-in-a-subversion-repository&quot;&gt;这个问题&lt;/a&gt;。&lt;/p&gt;
+&lt;h1 id=&quot;第1步&quot;&gt;第1步&lt;/h1&gt;
 
-&lt;p&gt;locks目录下有两个文件，db.lock和db-logs.lock。
-这个目录是为了兼容svn1.2或更老的版本才放在这里的，从svn1.3开始就没用了。
-两个lock文件的内容一模一样：&lt;/p&gt;
-
-&lt;blockquote&gt;
-&lt;p&gt;This file is not used by Subversion 1.3.x or later.
-However, its existence is required for compatibility with
-Subversion 1.2.x or earlier.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;hooks目录里放的是hook脚本模版，conf目录里主要放的是svnserve相关的配置文件，我们暂时先不讨论这两个目录。&lt;/p&gt;
-
-&lt;h3 id=&quot;repository文件系统&quot;&gt;Repository文件系统&lt;/h3&gt;
-
-&lt;p&gt;myrepo里还剩下一个目录没有介绍，db，我们展开来看一下这个目录。&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;myrepo/
-  |-db/
-    |-revprops/
-    |-revs/
-    |-transactions/
-    |-txn-protorevs/
-    |-current
-    |-format
-    |-fs-type
-    |-fsfs.conf
-    |-min-unpacked-rev
-    |-txn-current
-    |-txn-current-lock
-    |-uuid
-    |-write-lock
+&lt;p&gt;创建HelloWorld.java：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-java&quot; data-lang=&quot;java&quot;&gt;&lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;HelloWorld&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;private&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;native&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;public&lt;/span&gt; &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[]&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;new&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;HelloWorld&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;().&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;print&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;kd&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;System&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;na&quot;&gt;loadLibrary&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;HelloWorld&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;操作系统使用文件系统（File System）来存放文件和目录，于此类似，svn使用自己的文件系统存放版本化数据（Versioned Data）。
-本文后面提到的文件系统，在没有特殊说明的情况下，均指svn reposotiry filesystem，请不要把它和操作系统文件系统搞混。&lt;/p&gt;
+&lt;h1 id=&quot;第2步&quot;&gt;第2步&lt;/h1&gt;
 
-&lt;p&gt;svn文件系统是个抽象的概念，具体可以有不同的实现。
-最开始的时候，文件系统是用Berkeley DB实现的，简写做BDB。
-&lt;a href=&quot;https://subversion.apache.org/docs/release-notes/1.1.html&quot;&gt;svn1.1&lt;/a&gt;
-实现了一个新的文件系统，这个实现不是基于数据库的，而是直接使用操作系统的文件系统，所以简写成FSFS。
-&lt;a href=&quot;https://subversion.apache.org/docs/release-notes/1.2.html#fsfs&quot;&gt;svn1.2&lt;/a&gt;
-把FSFS变成了默认的文件系统实现。
-也就是说，在使用&lt;code&gt;svnadmin create&lt;/code&gt;命令创建repository的时候，默认创建出来的就是FSFS类型的repository。
-可以加上&lt;code&gt;--fs-type bdb&lt;/code&gt;选项来创建BDB类型的repository。
-&lt;a href=&quot;https://subversion.apache.org/docs/release-notes/1.8.html#bdb-deprecated&quot;&gt;svn1.8&lt;/a&gt;
-给BDB打上了deprecated标签，会慢慢停止维护。
-&lt;a href=&quot;https://subversion.apache.org/docs/release-notes/1.9.html#fsx&quot;&gt;svn1.9&lt;/a&gt;
-引入了一个新的文件系统实现，叫做FSX，但是还不太稳定，不建议用在生产环境中。&lt;/p&gt;
-
-&lt;p&gt;fs-type这个文件记录了repository用的是哪种类型的文件系统，可以打开看一下，里面写的是fsfs。
-下面我们详细讨论一下FSFS文件系统的目录结构。&lt;/p&gt;
-
-&lt;h2 id=&quot;fsfs文件系统目录结构&quot;&gt;FSFS文件系统目录结构&lt;/h2&gt;
-
-&lt;p&gt;FSFS是建立在OS文件系统之上的，因此db目录（和子目录）里放的都是普通的文件。
-这些文件大部分都可以用文本编辑器打开，但千万不要直接编辑！
-按照相关性，子目录和文件大致可以分为四类，下面进行介绍。&lt;/p&gt;
-
-&lt;h3 id=&quot;fsfs信息&quot;&gt;FSFS信息&lt;/h3&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;myrepo/
-  |-db/
-    |-current
-    |-format
-    |-fsfs.conf
-    |-min-unpacked-rev
-    |-uuid
+&lt;p&gt;编译HelloWorld.java：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;javac HelloWorld.java
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;FSFS相关的一些信息分散在五个文件里。
-format文件里放的是FSFS格式号和选项，我们打开它看一下：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;6
-layout sharded 1000
+&lt;h1 id=&quot;第3步&quot;&gt;第3步&lt;/h1&gt;
+
+&lt;p&gt;生成jni头文件：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;javah -jni HelloWorld
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;6是FSFS格式号。格式号和可以理解它们的svn版本号的对应关系如下表所示，更详细的介绍请看&lt;a href=&quot;http://serverfault.com/questions/277441/difference-between-the-format-and-db-format-files-in-a-subversion-repository&quot;&gt;这里&lt;/a&gt;和&lt;a href=&quot;http://svn.apache.org/repos/asf/subversion/trunk/subversion/libsvn_fs_fs/structure&quot;&gt;这里&lt;/a&gt;。&lt;/p&gt;
+&lt;p&gt;上面的命令执行完毕后，会生成HelloWorld.h：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;cm&quot;&gt;/* DO NOT EDIT THIS FILE - it is machine generated */&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;jni.h&amp;gt;
+&lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/* Header for class HelloWorld */&lt;/span&gt;
 
-&lt;table&gt;&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;FSFS格式号&lt;/th&gt;
-&lt;th style=&quot;text-align: left&quot;&gt;svn版本号&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;1&lt;/td&gt;
-&lt;td style=&quot;text-align: left&quot;&gt;1.1+&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;2&lt;/td&gt;
-&lt;td style=&quot;text-align: left&quot;&gt;1.4+&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;3&lt;/td&gt;
-&lt;td style=&quot;text-align: left&quot;&gt;1.5+&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;4&lt;/td&gt;
-&lt;td style=&quot;text-align: left&quot;&gt;1.6+&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;5&lt;/td&gt;
-&lt;td style=&quot;text-align: left&quot;&gt;1.7-dev&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;6&lt;/td&gt;
-&lt;td style=&quot;text-align: left&quot;&gt;1.8+&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-&lt;td&gt;7&lt;/td&gt;
-&lt;td style=&quot;text-align: left&quot;&gt;1.9+&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;&lt;/table&gt;
+&lt;span class=&quot;cp&quot;&gt;#ifndef _Included_HelloWorld
+#define _Included_HelloWorld
+#ifdef __cplusplus
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;extern&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;C&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#endif
+&lt;/span&gt;&lt;span class=&quot;cm&quot;&gt;/*
+ * Class:     HelloWorld
+ * Method:    print
+ * Signature: ()V
+ */&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;JNIEXPORT&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;JNICALL&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Java_HelloWorld_print&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JNIEnv&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jobject&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 
-&lt;p&gt;格式6只有一个layout选项，可选值是sharded或者linear。
-如果是sharded，后面还需要跟一个参数，表示每个shard里最多可以放多少个版本文件。
-后面介绍revs和revprops目录的时候，会进一步解释layout选项。
-格式7增加了一个addressing选项，可选值是physical或者logical。&lt;/p&gt;
+&lt;span class=&quot;cp&quot;&gt;#ifdef __cplusplus
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;cp&quot;&gt;#endif
+#endif
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1 id=&quot;第4步&quot;&gt;第4步&lt;/h1&gt;
 
-&lt;p&gt;fsfs.conf是FSFS配置文件，在里面可以配制缓存等选项。
-这个文件里有详细的注释，这里就不解释了。&lt;/p&gt;
-
-&lt;p&gt;uuid文件里放的是repository的&lt;a href=&quot;https://en.wikipedia.org/wiki/Universally_unique_identifier&quot;&gt;UUID&lt;/a&gt;（Universally Unique IDentifier），这个UUID主要是提供给svn客户端使用的。
-可以使用&lt;code&gt;svnlook uuid&lt;/code&gt;命令查看repository的UUID；使用&lt;code&gt;svnadmin setuuid&lt;/code&gt;命令修改repository的UUID。
-关于UUID的更多介绍，请看&lt;a href=&quot;http://svnbook.red-bean.com/en/1.8/svn.reposadmin.maint.html#svn.reposadmin.maint.uuids&quot;&gt;svnbook&lt;/a&gt;。
-&lt;a href=&quot;http://tortoisesvn.net/logcacheuuids.html&quot;&gt;这篇文章&lt;/a&gt;介绍了TortoiseSVN的日志缓存和UUID是如何配合使用的。
-myrepo的UUID是&lt;code&gt;9f4743fc-0d7f-4055-924f-210f3cf9ed31&lt;/code&gt;。&lt;/p&gt;
-
-&lt;p&gt;current文件里放的是repository的当前版本号（revision number，后面简称revnum）。
-当前版本号从0开始，每一次提交都会导致该版本号加一。
-min-unpacked-rev文件指出，从哪个版本开始，版本文件还没有被pack。
-后面介绍shard packing的时候，会进一步解释这个文件。&lt;/p&gt;
-
-&lt;h3 id=&quot;transaction&quot;&gt;Transaction&lt;/h3&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;myrepo/
-  |-db/
-    |-transactions/
-    |-txn-protorevs/
-    |-txn-current
-    |-txn-current-lock
-    |-write-lock
+&lt;p&gt;创建HelloWorld.c：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c&quot; data-lang=&quot;c&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#include &amp;lt;jni.h&amp;gt;
+#include &amp;lt;stdio.h&amp;gt;
+#include &quot;HelloWorld.h&quot;
+&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;JNIEXPORT&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;JNICALL&lt;/span&gt; 
+&lt;span class=&quot;nf&quot;&gt;Java_HelloWorld_print&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JNIEnv&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;jobject&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;o&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;Hello, World!&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;svn必须保证每次提交都是原子（Atomic）操作。
-比如说某次提交修改了3个文件，添加了1个文件，并且删除了2个文件。
-svn必须保证对这6个文件的改动要么全部生效，要么全部作废，否则版本库就会乱掉。
-为了强调这种原子性，svn把提交过程叫做transaction。&lt;/p&gt;
+&lt;h1 id=&quot;第5步&quot;&gt;第5步&lt;/h1&gt;
 
-&lt;p&gt;svn会给每次提交（也就是每个transaction）分配一个唯一id，后面简称txnid。
-txnid是一个36进制整数（使用了0到9和a到z这36个字符），从0开始递增。
-txn-current文件里放的是下一次提交的txnid，刚开始的时候是0。
-换句话说，第一次提交的txnid是0。
-每次提交开始的时候，svn服务器都会先锁住txn-current-lock文件，把里面的txnid加一，再解锁该文件。
-即使某次提交失败，也不会重复使用txnid。&lt;/p&gt;
-
-&lt;p&gt;每次提交会在transactions目录下创建一个名叫${revnum}-${txnid}.txn的子目录，并在这个子目录里创建一些文件。
-同时，还会在txn-protorevs目录下创建${revnum}-${txnid}.rev和${revnum}-${txnid}.rev-lock两个文件。
-假设提交开始前revnum（在current文件里）是3，txnid（在txn-current文件里）是x，那么transactions里创建的子目录就是3-x.txn，txn-protorevs里出现的两个文件分别是3-x.rev和3-x.rev-lock。
-这些目录和文件都是临时使用的，提交结束（无论成功与否）后就会被svn清理掉。
-它们的用处我们后面再详细讨论。&lt;/p&gt;
-
-&lt;p&gt;如果提交可以顺利完成，svn会在revs和revprops目录下各生成一个版本文件，然后修改current文件，把当前版本号加一。
-很显然，虽然多个客户端可以同时发起提交，但是最后这一步必须串行进行，否则就会出问题。
-这个串行是由write-lock文件保证的。
-svn服务器必须先锁住这个文件，完成提交，然后解锁这个文件。&lt;/p&gt;
-
-&lt;h3 id=&quot;版本数据&quot;&gt;版本数据&lt;/h3&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;myrepo/
-  |-db/
-    |-revprops/
-      |-0/
-        |-0
-    |-revs/
-      |-0/
-        |-0
+&lt;p&gt;编译HelloWorld.c，生成动态链接库：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;gcc &lt;span class=&quot;s2&quot;&gt;&quot;-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    &lt;span class=&quot;s2&quot;&gt;&quot;-I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include/darwin&quot;&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    -c HelloWorld.c
+gcc -dynamiclib -o libHelloWorld.dylib HelloWorld.o
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;p&gt;svn在自己的文件系统里存放的是增量数据，也就是版本之间的差异。
-每次成功提交都会生成两个文件，文件名就是版本号，没有后缀。
-一个文件记录和上一个版本的差异，放在revs目录里。
-另一个是属性文件，记录提交日期、注释等信息，放在revprops目录里。
-具体的文件内容将在后面介绍。&lt;/p&gt;
+&lt;h1 id=&quot;第6步&quot;&gt;第6步&lt;/h1&gt;
 
-&lt;p&gt;在格式3（svn1.5）之前，这些文件是直接放在各自目录下面的。
-&lt;a href=&quot;http://subversion.apache.org/docs/release-notes/1.5.html#fsfs-sharding&quot;&gt;svn1.5&lt;/a&gt;进行了优化，引入了分区机制。
-format文件里的layout选项指出是否启用分区，sharded表示启用，linear表示不启用。
-启用分区之后，版本文件会分文件夹放置。
-分区文件夹从0开始编号，一个满了再用另一个。
-因为我们的layout选项是&lt;code&gt;sharded 1000&lt;/code&gt;，还没有进行提交，所以db目录长上面那个样子。
-注意，版本0是创建repository的时候自动生成的。
-假设已经进行了1000次提交，那么这时db目录应该是下面这样：&lt;/p&gt;
-&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-&quot; data-lang=&quot;&quot;&gt;myrepo/
-  |-db/
-    |-revprops/
-      |-0/
-        |-0
-          ...
-        |-999
-      |-1/
-        |-1000
-    |-revs/
-      |-0/
-        |-0
-          ...
-        |999
-      |-1/
-        |1000
+&lt;p&gt;运行HelloWorld程序：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;java HelloWorld
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
-&lt;hr&gt;
+&lt;h1 id=&quot;参考资料&quot;&gt;参考资料&lt;/h1&gt;
 
-&lt;h1 id=&quot;客户端&quot;&gt;客户端&lt;/h1&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/intro.html&quot;&gt;http://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/intro.html&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;http://mrjoelkemp.com/2012/01/getting-started-with-jni-and-c-on-osx-lion/&quot;&gt;http://mrjoelkemp.com/2012/01/getting-started-with-jni-and-c-on-osx-lion/&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
 </description>
-        <pubDate>Thu, 12 Nov 2015 00:00:00 +0800</pubDate>
-        <link>http://yourdomain.com/myblog/2015/11/12/how-svn-works.html</link>
-        <guid isPermaLink="true">http://yourdomain.com/myblog/2015/11/12/how-svn-works.html</guid>
+        <pubDate>Tue, 05 Jan 2016 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/myblog/2016/01/05/jni-helloworld.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/myblog/2016/01/05/jni-helloworld.html</guid>
         
         
       </item>
