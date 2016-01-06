@@ -37,3 +37,6 @@ import "C"
 func main() {
     C.loadJVM()
 }
+
+// export LD_LIBRARY_PATH=/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/jli/
+
