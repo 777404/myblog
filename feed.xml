@@ -6,9 +6,152 @@
 </description>
     <link>http://yourdomain.com/myblog/</link>
     <atom:link href="http://yourdomain.com/myblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 05 Jan 2016 20:51:09 +0800</pubDate>
-    <lastBuildDate>Tue, 05 Jan 2016 20:51:09 +0800</lastBuildDate>
+    <pubDate>Wed, 06 Jan 2016 18:35:18 +0800</pubDate>
+    <lastBuildDate>Wed, 06 Jan 2016 18:35:18 +0800</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
+    
+      <item>
+        <title>JNI笔记之三：用Go启动Java虚拟机</title>
+        <description>&lt;h1 id=&quot;测试环境&quot;&gt;测试环境&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;Mac OS X 10.11&lt;/li&gt;
+&lt;li&gt;JDK 1.8.0_60&lt;/li&gt;
+&lt;li&gt;Go 1.5.1&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;第1步&quot;&gt;第1步&lt;/h1&gt;
+
+&lt;p&gt;在./src/loadjvm目录下创建main.go：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-go&quot; data-lang=&quot;go&quot;&gt;&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #cgo CFLAGS: -I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #cgo CFLAGS: -I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include/darwin&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #cgo LDFLAGS: -L/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/jli -ljli&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #include &amp;lt;stdbool.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #include &amp;lt;stdlib.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #include &amp;lt;jni.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// &lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// void loadJVM() {&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     JavaVM *jvm;       /* denotes a Java VM */&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     JNIEnv *env;       /* pointer to native method interface */&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     JavaVMInitArgs vm_args; /* JDK/JRE 6 VM initialization arguments */&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     JavaVMOption* options = malloc(1 * sizeof(JavaVMOption));&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     options[0].optionString = &quot;-Djava.class.path=.&quot;;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     vm_args.version = JNI_VERSION_1_6;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     vm_args.nOptions = 1;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     vm_args.options = options;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     vm_args.ignoreUnrecognized = false;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     /* load and initialize a Java VM, return a JNI interface&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//      * pointer in env */&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     JNI_CreateJavaVM(&amp;amp;jvm, (void**)&amp;amp;env, (void*)&amp;amp;vm_args);&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     // delete options;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     /* invoke the Main.test method using the JNI */&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     jclass cls = (*env)-&amp;gt;FindClass(env, &quot;HelloWorld&quot;);&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     jmethodID mid = (*env)-&amp;gt;GetStaticMethodID(env, &lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//         cls, &quot;main&quot;, &quot;([Ljava/lang/String;)V&quot;);&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//    &lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     (*env)-&amp;gt;CallStaticVoidMethod(env, cls, mid);&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     // /* We are done. */&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     (*jvm)-&amp;gt;DestroyJavaVM(jvm);&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// }&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;C&quot;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loadJVM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1 id=&quot;第2步&quot;&gt;第2步&lt;/h1&gt;
+
+&lt;p&gt;编译main.go：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;GOPATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;
+go install loadjvm
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1 id=&quot;第3步&quot;&gt;第3步&lt;/h1&gt;
+
+&lt;p&gt;把&lt;a href=&quot;/myblog/2016/01/05/jni-helloworld.html&quot;&gt;HelloWorld.class和libHelloWorld.dylib&lt;/a&gt;
+拷贝到当前目录，然后运行loadjvm：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;LD_LIBRARY_PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/jli/
+./bin/loadjvm
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1 id=&quot;第4步&quot;&gt;第4步&lt;/h1&gt;
+
+&lt;p&gt;用Go重写loadJVM()：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-go&quot; data-lang=&quot;go&quot;&gt;&lt;span class=&quot;k&quot;&gt;package&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #cgo CFLAGS: -I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #cgo CFLAGS: -I/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/include/darwin&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #cgo LDFLAGS: -L/Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/jre/lib/jli -ljli&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #include &amp;lt;stdbool.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #include &amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #include &amp;lt;stdlib.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// #include &amp;lt;jni.h&amp;gt;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// &lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// jint createJavaVM(JavaVM **pvm, JNIEnv **penv, JavaVMInitArgs *args) {&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     return JNI_CreateJavaVM(pvm, (void **)penv, (void *)args);&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// }&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// jclass envFindClass(JNIEnv *env, const char *name) {&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     return (*env)-&amp;gt;FindClass(env, name);&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// }&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// jmethodID envGetStaticMethodID(JNIEnv *env, jclass clazz, const char *name, const char *sig) {&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     return (*env)-&amp;gt;GetStaticMethodID(env, clazz, name, sig);&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// }&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// void envCallStaticVoidMethod(JNIEnv *env, jclass cls, jmethodID methodID) {&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     (*env)-&amp;gt;CallStaticVoidMethod(env, cls, methodID);&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// }&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// jint vmDestroyJavaVM(JavaVM *vm) {&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;//     return (*vm)-&amp;gt;DestroyJavaVM(vm);&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;c&quot;&gt;// }&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;import&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;C&quot;&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loadJVM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+
+&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;loadJVM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jvm&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JavaVM&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JNIEnv&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vm_args&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JavaVMInitArgs&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JavaVMOption&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;optionString&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;-Djava.class.path=.&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vm_args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;version&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;JNI_VERSION_1_6&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vm_args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;nOptions&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vm_args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vm_args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ignoreUnrecognized&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;createJavaVM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jvm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vm_args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+
+    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cls&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jclass&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;envFindClass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;HelloWorld&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;var&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mid&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jmethodID&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;envGetStaticMethodID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cls&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; 
+        &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;main&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CString&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;([Ljava/lang/String;)V&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;))&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;envCallStaticVoidMethod&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cls&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;x&quot;&gt; &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+
+    &lt;/span&gt;&lt;span class=&quot;n&quot;&gt;C&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vmDestroyJavaVM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jvm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;x&quot;&gt;
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1 id=&quot;第5步&quot;&gt;第5步&lt;/h1&gt;
+
+&lt;p&gt;重写编译和运行loadjvm.go：&lt;/p&gt;
+&lt;div class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-shell&quot; data-lang=&quot;shell&quot;&gt;go install loadjvm
+./bin/loadjvm
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;h1 id=&quot;参考资料&quot;&gt;参考资料&lt;/h1&gt;
+
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://blog.golang.org/c-go-cgo&quot;&gt;http://blog.golang.org/c-go-cgo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://golang.org/cmd/cgo/&quot;&gt;https://golang.org/cmd/cgo/&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/golang/go/wiki/cgo&quot;&gt;https://github.com/golang/go/wiki/cgo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://github.com/abneptis/GoJVM&quot;&gt;https://github.com/abneptis/GoJVM&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Wed, 06 Jan 2016 00:00:00 +0800</pubDate>
+        <link>http://yourdomain.com/myblog/2016/01/06/jni-loadjvmintogo.html</link>
+        <guid isPermaLink="true">http://yourdomain.com/myblog/2016/01/06/jni-loadjvmintogo.html</guid>
+        
+        
+      </item>
     
       <item>
         <title>JNI笔记之二：Invocation API</title>
@@ -52,12 +195,7 @@
     &lt;span class=&quot;n&quot;&gt;jclass&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cls&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;FindClass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;HelloWorld&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;jmethodID&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mid&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;GetStaticMethodID&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
         &lt;span class=&quot;n&quot;&gt;cls&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;main&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;([Ljava/lang/String;)V&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;jobjectArray&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NewObjectArray&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; 
-        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;FindClass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;java/lang/String&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;NewStringUTF&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt; 
-
-    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CallStaticVoidMethod&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cls&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;args&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;CallStaticVoidMethod&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cls&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;mid&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
     &lt;span class=&quot;c1&quot;&gt;// /* We are done. */
 &lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jvm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&amp;gt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;DestroyJavaVM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;jvm&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
