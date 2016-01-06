@@ -122,8 +122,8 @@ func loadJVM() {
     var cls C.jclass = C.envFindClass(env, C.CString("HelloWorld"))
     var mid C.jmethodID = C.envGetStaticMethodID(env, cls, 
         C.CString("main"), C.CString("([Ljava/lang/String;)V"))
-
     C.envCallStaticVoidMethod(env, cls, mid)
+    
     C.vmDestroyJavaVM(jvm)
 }
 ```
