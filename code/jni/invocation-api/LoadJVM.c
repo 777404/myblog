@@ -28,12 +28,7 @@ void loadJVM() {
     jclass cls = (*env)->FindClass(env, "HelloWorld");
     jmethodID mid = (*env)->GetStaticMethodID(env, 
         cls, "main", "([Ljava/lang/String;)V");
-
-    jobjectArray args = (*env)->NewObjectArray(env, 5, 
-        (*env)->FindClass(env, "java/lang/String"),
-        (*env)->NewStringUTF(env, "")); 
-    
-    (*env)->CallStaticVoidMethod(env, cls, mid, args);
+    (*env)->CallStaticVoidMethod(env, cls, mid);
     // /* We are done. */
     (*jvm)->DestroyJavaVM(jvm);
 }
