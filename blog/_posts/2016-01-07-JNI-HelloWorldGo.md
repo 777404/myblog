@@ -15,3 +15,7 @@ date:   2016-01-06
 # 第4步
 # 第5步
 # 第6步
+
+
+# 参考资料
+* https://blog.dogan.io/2015/08/15/java-jni-jnr-go/
