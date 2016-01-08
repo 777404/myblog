@@ -129,7 +129,7 @@ func loadJVM() {
 ```
 
 # 第5步
-重写编译和运行loadjvm.go：
+重写编译和运行loadjvm：
 
 ```shell
 go install loadjvm
