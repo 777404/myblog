@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "JNI笔记之四：用Go实现Java本地方法"
+title:  "JNI笔记之三：用Go启动Java虚拟机"
 date:   2016-01-06
 ---
 
