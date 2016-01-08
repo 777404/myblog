@@ -6,8 +6,8 @@
 </description>
     <link>http://yourdomain.com/myblog/</link>
     <atom:link href="http://yourdomain.com/myblog/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 08 Jan 2016 17:17:26 +0800</pubDate>
-    <lastBuildDate>Fri, 08 Jan 2016 17:17:26 +0800</lastBuildDate>
+    <pubDate>Fri, 08 Jan 2016 17:21:00 +0800</pubDate>
+    <lastBuildDate>Fri, 08 Jan 2016 17:21:00 +0800</lastBuildDate>
     <generator>Jekyll v3.0.0</generator>
     
       <item>
@@ -67,7 +67,7 @@ go build -buildmode&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;c-shared -o lib
       </item>
     
       <item>
-        <title>JNI笔记之三：用Go启动Java虚拟机</title>
+        <title>JNI笔记之四：用Go实现Java本地方法</title>
         <description>&lt;h1 id=&quot;测试环境&quot;&gt;测试环境&lt;/h1&gt;
 
 &lt;ul&gt;
