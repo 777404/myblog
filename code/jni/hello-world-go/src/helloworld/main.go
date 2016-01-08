@@ -12,4 +12,7 @@ func Java_HelloWorld_print(env *C.JNIEnv, obj C.jobject) {
 
 func main() {}
 
-// go build -buildmode=c-shared -o libHelloWorld.dylib math.go
+/*
+export GOPATH=`pwd`
+go build -buildmode=c-shared -o libHelloWorld.dylib helloworld
+*/
