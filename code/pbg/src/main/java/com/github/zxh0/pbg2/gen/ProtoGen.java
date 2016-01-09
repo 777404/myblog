@@ -78,6 +78,10 @@ public class ProtoGen {
                     .append(getTag(rule, ruleClass));
 
             Object defaultValue = getDefaultValue(msg, field);
+            if (defaultValue instanceof String) {
+                // todo escape
+                defaultValue = "\"" + defaultValue + "\"";
+            }
             if (defaultValue != null) {
                 buf.append(" [default = ").append(defaultValue).append("]");
             }
