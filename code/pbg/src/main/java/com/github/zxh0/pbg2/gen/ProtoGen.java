@@ -7,39 +7,35 @@ import java.lang.reflect.Constructor;
 
 public class ProtoGen {
 
-    public static String gen(Class<?> msgClass) {
+    public static String gen(Class<?> msgOrEnumClass) {
         try {
-            Constructor<?> init = msgClass.getDeclaredConstructor();
+            Constructor<?> init = msgOrEnumClass.getDeclaredConstructor();
             init.setAccessible(true);
-            Object msgObj = init.newInstance();
-            return gen(msgObj);
+            Object msgOrEnum = init.newInstance();
+            return gen(msgOrEnum);
         } catch (ReflectiveOperationException e) {
             throw new ProtoGenException(e);
         }
     }
 
-    private static String gen(Object msg) {
+    private static String gen(Object msgOrEnum) {
         StringBuilder buf = new StringBuilder();
 
-        Class<?> c = msg.getClass();
+        Class<?> c = msgOrEnum.getClass();
         Message msgAnnotation = c.getAnnotation(Message.class);
         Enum enumAnnotation = c.getAnnotation(Enum.class);
 
         if (msgAnnotation != null && enumAnnotation != null) {
             throw new ProtoGenException("Both @Message and @Enum annotated for class " + c);
         } else if (msgAnnotation != null) {
-            MessageGen.genMessage(msg, buf);
+            MessageGen.genMessage(msgOrEnum, buf);
         } else if (enumAnnotation != null) {
-            // todo
+            EnumGen.genEnum(msgOrEnum, buf);
         } else {
             throw new ProtoGenException("@Message or @Enum not annotated for class " + c);
         }
 
         return buf.toString();
-    }
-
-    private static void genEnum(Class<?> c) {
-
     }
 
 }
