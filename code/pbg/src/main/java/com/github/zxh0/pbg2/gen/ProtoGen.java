@@ -30,7 +30,7 @@ public class ProtoGen {
         } else if (msgAnnotation != null) {
             MessageGen.genMessage(msgOrEnum, buf);
         } else if (enumAnnotation != null) {
-            EnumGen.genEnum(msgOrEnum, buf);
+            EnumGen.genEnum(msgOrEnum, enumAnnotation, buf);
         } else {
             throw new ProtoGenException("@Message or @Enum not annotated for class " + c);
         }
