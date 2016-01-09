@@ -1,7 +1,10 @@
 package com.github.zxh0.pbg2;
 
+import com.github.zxh0.pbg2.proto.Message;
 import com.github.zxh0.pbg2.proto.OptimizeForOption;
 import com.github.zxh0.pbg2.proto.Proto;
+import com.github.zxh0.pbg2.proto.field.rules.Repeated;
+import com.github.zxh0.pbg2.proto.field.types.Int32;
 import org.junit.Test;
 
 public class OptionsTest {
@@ -11,13 +14,16 @@ public class OptionsTest {
         javaOuterClassname = "Ponycopter",
         optimizeFor = OptimizeForOption.CODE_SIZE
     )
-    static class Options {
-
+    static class OptionsProto {
+        @Message
+        static class Options {
+            @Repeated(tag = 4, packed = true) Int32 samples;
+        }
     }
 
     @Test
     public void test() {
-        TestHelper.testOutput(Options.class, "pb2/options_test.proto");
+        TestHelper.testOutput(OptionsProto.class, "pb2/options_test.proto");
     }
 
 }
