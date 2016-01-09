@@ -28,16 +28,15 @@ public class MessageGen {
                 .append(" ")
                 .append(field.getType().getSimpleName().toLowerCase())
                 .append(" ")
-                .append(toSnakeCase(field.getName()))
+                .append(StringUtil.toSnakeCase(field.getName()))
                 .append(" = ")
                 .append(getTag(rule, ruleClass));
 
         Object defaultValue = getDefaultValue(msg, field);
-        if (defaultValue instanceof String) {
-            // todo escape
-            defaultValue = "\"" + defaultValue + "\"";
-        }
         if (defaultValue != null) {
+            if (defaultValue instanceof String) {
+                defaultValue = StringUtil.quote((String) defaultValue);
+            }
             buf.append(" [default = ").append(defaultValue).append("]");
         }
 
@@ -62,13 +61,6 @@ public class MessageGen {
         }
 
         return rules[0];
-    }
-
-    // fooBar => foo_bar
-    private static String toSnakeCase(String fieldName) {
-        return Pattern.compile("(?=[A-Z])").splitAsStream(fieldName)
-                .map(word -> word.toLowerCase())
-                .collect(Collectors.joining("_"));
     }
 
     private static int getTag(Object ruleObj, Class<?> ruleClass) {
