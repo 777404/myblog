@@ -1,10 +1,10 @@
-package com.github.zxh0.pbg.gen;
+package com.github.zxh0.pbg2.gen;
 
-import com.github.zxh0.pbg.msg.Enum;
-import com.github.zxh0.pbg.msg.Message;
-import com.github.zxh0.pbg.msg.field.rules.Optional;
-import com.github.zxh0.pbg.msg.field.rules.Repeated;
-import com.github.zxh0.pbg.msg.field.rules.Required;
+import com.github.zxh0.pbg2.msg.Enum;
+import com.github.zxh0.pbg2.msg.Message;
+import com.github.zxh0.pbg2.msg.field.rules.Optional;
+import com.github.zxh0.pbg2.msg.field.rules.Repeated;
+import com.github.zxh0.pbg2.msg.field.rules.Required;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

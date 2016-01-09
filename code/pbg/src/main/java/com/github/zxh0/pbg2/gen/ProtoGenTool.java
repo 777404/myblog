@@ -1,4 +1,4 @@
-package com.github.zxh0.pbg.gen;
+package com.github.zxh0.pbg2.gen;
 
 import java.util.HashSet;
 import java.util.Set;
