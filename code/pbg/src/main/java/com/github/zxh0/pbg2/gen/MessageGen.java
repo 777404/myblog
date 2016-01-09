@@ -1,5 +1,6 @@
 package com.github.zxh0.pbg2.gen;
 
+import com.github.zxh0.pbg2.proto.Message;
 import com.github.zxh0.pbg2.proto.field.rules.Optional;
 import com.github.zxh0.pbg2.proto.field.rules.Repeated;
 import com.github.zxh0.pbg2.proto.field.rules.Required;
@@ -41,7 +42,6 @@ public class MessageGen {
     private static void genNestedTypes(Class<?> c, StringBuilder buf, String indentation) {
         for (Class<?> innerClass : c.getDeclaredClasses()) {
             genMessage(innerClass, buf, indentation + "    ");
-            buf.append("\n");
         }
     }
 
@@ -105,15 +105,21 @@ public class MessageGen {
     }
 
     private static String getFieldType(Field field) {
-        if (isScalarType(field)) {
-            return field.getType().getSimpleName().toLowerCase();
-        } else {
-            return field.getType().getSimpleName();
+        Class<?> fieldClass = field.getType();
+        if (isScalarType(field.getType())) {
+            return fieldClass.getSimpleName().toLowerCase();
         }
+        Class<?> outerClass = fieldClass.getEnclosingClass();
+        if (outerClass != null
+                && outerClass.getAnnotation(Message.class) != null
+                && outerClass != field.getDeclaringClass()) {
+            return outerClass.getSimpleName() + "." + fieldClass.getSimpleName();
+        }
+        return fieldClass.getSimpleName();
     }
 
-    private static boolean isScalarType(Field field) {
-        return field.getType().getPackage() == Int32.class.getPackage();
+    private static boolean isScalarType(Class<?> fieldClass) {
+        return fieldClass.getPackage() == Int32.class.getPackage();
     }
 
     private static int getTag(Object ruleObj, Class<?> ruleClass) {
