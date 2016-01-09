@@ -11,7 +11,6 @@ import static java.lang.annotation.ElementType.FIELD;
 public @interface Required {
 
     public int tag();
-    public boolean packed() default false;
     public boolean deprecated() default false;
 
 }

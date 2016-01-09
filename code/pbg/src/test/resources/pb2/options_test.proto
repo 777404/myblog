@@ -1,0 +1,7 @@
+option java_package = "com.example.foo";
+option java_outer_classname = "Ponycopter";
+option optimize_for = CODE_SIZE;
+
+message Options {
+    repeated int32 samples = 4 [packed = true];
+}

@@ -13,5 +13,5 @@ public @interface Repeated {
     public int tag();
     public boolean packed() default false;
     public boolean deprecated() default false;
-    
+
 }
