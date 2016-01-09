@@ -6,40 +6,55 @@ import com.github.zxh0.pbg2.proto.field.rules.Required;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MessageGen {
 
     public static void genMessage(Class<?> c, StringBuilder buf) {
+        genMessage(c, buf, "");
+    }
+
+    public static void genMessage(Class<?> c, StringBuilder buf, String indentation) {
         try {
             Constructor<?> init = c.getDeclaredConstructor();
             init.setAccessible(true);
             Object msg = init.newInstance();
-            MessageGen.genMessage(msg, buf);
+            MessageGen.genMessage(msg, buf, indentation);
         } catch (ReflectiveOperationException e) {
             throw new ProtoGenException(e);
         }
     }
 
-    private static void genMessage(Object msg, StringBuilder buf) {
+    private static void genMessage(Object msg, StringBuilder buf, String indentation) {
         Class<?> c = msg.getClass();
-        buf.append("message ").append(c.getSimpleName()).append(" {\n");
-        genFields(msg, c, buf);
-        buf.append("}");
+        buf.append(indentation)
+                .append("message ")
+                .append(c.getSimpleName())
+                .append(" {\n");
+        genNestedTypes(c, buf, indentation);
+        genFields(msg, buf, indentation);
+        buf.append(indentation)
+                .append("}");
     }
 
-    private static void genFields(Object msg, Class<?> c, StringBuilder buf) {
-        for (Field field : c.getDeclaredFields()) {
-            genField(msg, field, buf);
+    private static void genNestedTypes(Class<?> c, StringBuilder buf, String indentation) {
+        for (Class<?> innerClass : c.getDeclaredClasses()) {
+            genMessage(innerClass, buf, indentation + "    ");
+            buf.append("\n");
         }
     }
 
-    private static void genField(Object msg, Field field, StringBuilder buf) {
+    private static void genFields(Object msg, StringBuilder buf, String indentation) {
+        for (Field field : msg.getClass().getDeclaredFields()) {
+            genField(msg, field, buf, indentation);
+        }
+    }
+
+    private static void genField(Object msg, Field field, StringBuilder buf, String indentation) {
         Object rule = checkAndGetRule(field);
         Class<?> ruleClass = rule.getClass().getInterfaces()[0];
-        buf.append("    ")
+        buf.append(indentation)
+                .append("    ")
                 .append(ruleClass.getSimpleName().toLowerCase())
                 .append(" ")
                 .append(field.getType().getSimpleName().toLowerCase())
@@ -54,7 +69,9 @@ public class MessageGen {
                 if (defaultValue instanceof String) {
                     defaultValue = StringUtil.quote((String) defaultValue);
                 }
-                buf.append(" [default = ").append(defaultValue).append("]");
+                buf.append(" [default = ")
+                        .append(defaultValue)
+                        .append("]");
             }
         }
         if (rule instanceof Repeated) {

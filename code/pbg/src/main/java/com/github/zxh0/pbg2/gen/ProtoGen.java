@@ -5,7 +5,6 @@ import com.github.zxh0.pbg2.proto.Message;
 import com.github.zxh0.pbg2.proto.OptimizeForOption;
 import com.github.zxh0.pbg2.proto.Proto;
 
-import java.lang.reflect.Constructor;
 import java.util.stream.Stream;
 
 public class ProtoGen {
@@ -79,7 +78,6 @@ public class ProtoGen {
                     .append(annotation.optimizeFor())
                     .append(";\n");
         }
-
         if (hasOption) {
             buf.append("\n");
         }
