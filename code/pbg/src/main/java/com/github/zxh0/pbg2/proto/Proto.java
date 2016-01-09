@@ -10,12 +10,6 @@ import static java.lang.annotation.ElementType.TYPE;
 @Target(value={TYPE})
 public @interface Proto {
 
-    enum OptimizeForOption {
-        SPEED,
-        CODE_SIZE,
-        LITE_RUNTIME
-    }
-
     // file options
     public String javaPackage() default "";
     public String javaOuterClassname() default "";
