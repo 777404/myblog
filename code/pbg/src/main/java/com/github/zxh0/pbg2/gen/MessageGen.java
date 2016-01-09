@@ -4,6 +4,7 @@ import com.github.zxh0.pbg2.proto.field.rules.Optional;
 import com.github.zxh0.pbg2.proto.field.rules.Repeated;
 import com.github.zxh0.pbg2.proto.field.rules.Required;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -11,13 +12,28 @@ import java.util.stream.Stream;
 
 public class MessageGen {
 
-    public static void genMessage(Object msg, StringBuilder buf) {
+    public static void genMessage(Class<?> c, StringBuilder buf) {
+        try {
+            Constructor<?> init = c.getDeclaredConstructor();
+            init.setAccessible(true);
+            Object msg = init.newInstance();
+            MessageGen.genMessage(msg, buf);
+        } catch (ReflectiveOperationException e) {
+            throw new ProtoGenException(e);
+        }
+    }
+
+    private static void genMessage(Object msg, StringBuilder buf) {
         Class<?> c = msg.getClass();
         buf.append("message ").append(c.getSimpleName()).append(" {\n");
+        genFields(msg, c, buf);
+        buf.append("}");
+    }
+
+    private static void genFields(Object msg, Class<?> c, StringBuilder buf) {
         for (Field field : c.getDeclaredFields()) {
             genField(msg, field, buf);
         }
-        buf.append("}");
     }
 
     private static void genField(Object msg, Field field, StringBuilder buf) {

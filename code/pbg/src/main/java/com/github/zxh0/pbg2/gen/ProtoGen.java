@@ -86,14 +86,7 @@ public class ProtoGen {
     }
 
     private static void genMessage(Class<?> c, StringBuilder buf) {
-        try {
-            Constructor<?> init = c.getDeclaredConstructor();
-            init.setAccessible(true);
-            Object msg = init.newInstance();
-            MessageGen.genMessage(msg, buf);
-        } catch (ReflectiveOperationException e) {
-            throw new ProtoGenException(e);
-        }
+        MessageGen.genMessage(c, buf);
     }
 
     private static void genEnum(Class<?> c, Enum enumAnnotation, StringBuilder buf) {
