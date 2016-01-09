@@ -1,4 +1,4 @@
-package com.github.zxh0.pbg2.msg.field.rules;
+package com.github.zxh0.pbg2.proto.field.rules;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

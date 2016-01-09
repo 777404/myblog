@@ -1,4 +1,4 @@
-package com.github.zxh0.pbg2.msg;
+package com.github.zxh0.pbg2.proto;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -8,6 +8,9 @@ import static java.lang.annotation.ElementType.TYPE;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value={TYPE})
-public @interface Message {
-    // todo
+public @interface Enum {
+
+    public boolean allowAlias() default false;
+
 }
+
