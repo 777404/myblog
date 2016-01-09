@@ -9,7 +9,11 @@ import com.github.zxh0.pbg2.msg.field.types.Fixed64;
 import com.github.zxh0.pbg2.msg.field.types.Float;
 import com.github.zxh0.pbg2.msg.field.types.Int32;
 import com.github.zxh0.pbg2.msg.field.types.Sint32;
+import org.apache.commons.io.IOUtils;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.io.IOException;
 
 public class FieldRulesTest {
 
@@ -22,14 +26,10 @@ public class FieldRulesTest {
     }
 
     @Test
-    public void test() {
-//        IOUt
-//        ClassLoader.getSystemResourceAsStream()
-    }
-
-    public static void main(String[] args) {
-        String x = ProtoGen.gen(FieldRules.class);
-        System.out.println(x);
+    public void test() throws IOException {
+        String expected = IOUtils.toString(ClassLoader.getSystemResource("pb2/field_rules.proto"));
+        String actual = ProtoGen.gen(FieldRules.class);
+        Assert.assertEquals(expected, actual);
     }
 
 }

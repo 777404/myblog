@@ -79,7 +79,7 @@ public class ProtoGen {
 
             Object defaultValue = getDefaultValue(msg, field);
             if (defaultValue != null) {
-                buf.append(" [").append(defaultValue).append("]");
+                buf.append(" [default = ").append(defaultValue).append("]");
             }
 
             buf.append(";\n");
