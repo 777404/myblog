@@ -32,12 +32,19 @@ public class MessageGen {
                 .append(" = ")
                 .append(getTag(rule, ruleClass));
 
-        Object defaultValue = getDefaultValue(msg, field);
-        if (defaultValue != null) {
-            if (defaultValue instanceof String) {
-                defaultValue = StringUtil.quote((String) defaultValue);
+        if (rule instanceof Optional) {
+            Object defaultValue = getDefaultValue(msg, field);
+            if (defaultValue != null) {
+                if (defaultValue instanceof String) {
+                    defaultValue = StringUtil.quote((String) defaultValue);
+                }
+                buf.append(" [default = ").append(defaultValue).append("]");
             }
-            buf.append(" [default = ").append(defaultValue).append("]");
+        }
+        if (rule instanceof Repeated) {
+            if (((Repeated) rule).packed()) {
+                buf.append(" [packed = true]");
+            }
         }
 
         buf.append(";\n");
