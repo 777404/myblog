@@ -1,8 +1,8 @@
 package com.github.zxh0.pbg2.gen;
 
-import com.github.zxh0.pbg2.msg.field.rules.Optional;
-import com.github.zxh0.pbg2.msg.field.rules.Repeated;
-import com.github.zxh0.pbg2.msg.field.rules.Required;
+import com.github.zxh0.pbg2.proto.field.rules.Optional;
+import com.github.zxh0.pbg2.proto.field.rules.Repeated;
+import com.github.zxh0.pbg2.proto.field.rules.Required;
 
 import java.lang.reflect.Field;
 import java.util.regex.Pattern;

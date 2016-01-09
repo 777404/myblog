@@ -1,7 +1,7 @@
 package com.github.zxh0.pbg2.gen;
 
-import com.github.zxh0.pbg2.msg.Enum;
-import com.github.zxh0.pbg2.msg.Message;
+import com.github.zxh0.pbg2.proto.Enum;
+import com.github.zxh0.pbg2.proto.Message;
 
 import java.lang.reflect.Constructor;
 

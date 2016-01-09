@@ -1,6 +1,6 @@
 package com.github.zxh0.pbg2;
 
-import com.github.zxh0.pbg2.msg.Enum;
+import com.github.zxh0.pbg2.proto.Enum;
 import org.junit.Test;
 
 import java.io.IOException;

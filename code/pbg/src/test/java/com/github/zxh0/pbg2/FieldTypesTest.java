@@ -1,11 +1,11 @@
 package com.github.zxh0.pbg2;
 
-import com.github.zxh0.pbg2.msg.Message;
-import com.github.zxh0.pbg2.msg.field.rules.Required;
-import com.github.zxh0.pbg2.msg.field.types.*;
-import com.github.zxh0.pbg2.msg.field.types.Double;
-import com.github.zxh0.pbg2.msg.field.types.Float;
-import com.github.zxh0.pbg2.msg.field.types.String;
+import com.github.zxh0.pbg2.proto.Message;
+import com.github.zxh0.pbg2.proto.field.rules.Required;
+import com.github.zxh0.pbg2.proto.field.types.*;
+import com.github.zxh0.pbg2.proto.field.types.Double;
+import com.github.zxh0.pbg2.proto.field.types.Float;
+import com.github.zxh0.pbg2.proto.field.types.String;
 import org.junit.Test;
 
 import java.io.IOException;
