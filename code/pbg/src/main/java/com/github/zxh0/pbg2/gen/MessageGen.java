@@ -21,6 +21,30 @@ public class MessageGen {
     }
 
     private static void genField(Object msg, Field field, StringBuilder buf) {
+        Object rule = checkAndGetRule(field);
+        Class<?> ruleClass = rule.getClass().getInterfaces()[0];
+        buf.append("    ")
+                .append(ruleClass.getSimpleName().toLowerCase())
+                .append(" ")
+                .append(field.getType().getSimpleName().toLowerCase())
+                .append(" ")
+                .append(toSnakeCase(field.getName()))
+                .append(" = ")
+                .append(getTag(rule, ruleClass));
+
+        Object defaultValue = getDefaultValue(msg, field);
+        if (defaultValue instanceof String) {
+            // todo escape
+            defaultValue = "\"" + defaultValue + "\"";
+        }
+        if (defaultValue != null) {
+            buf.append(" [default = ").append(defaultValue).append("]");
+        }
+
+        buf.append(";\n");
+    }
+
+    private static Object checkAndGetRule(Field field) {
         Required required = field.getAnnotation(Required.class);
         Repeated repeated = field.getAnnotation(Repeated.class);
         Optional optional = field.getAnnotation(Optional.class);
@@ -29,31 +53,15 @@ public class MessageGen {
                 .filter(a -> a != null)
                 .toArray();
         if (rules.length > 1) {
-            throw new ProtoGenException("More than one of @Required, @Repeated or @Optional annotated for field " + field);
+            throw new ProtoGenException("More than one of @Required, @Repeated or @Optional " +
+                    "annotated for field " + field);
         }
-        if (rules.length == 1) {
-            Object rule = rules[0];
-            Class<?> ruleClass = rule.getClass().getInterfaces()[0];
-            buf.append("    ")
-                    .append(ruleClass.getSimpleName().toLowerCase())
-                    .append(" ")
-                    .append(field.getType().getSimpleName().toLowerCase())
-                    .append(" ")
-                    .append(toSnakeCase(field.getName()))
-                    .append(" = ")
-                    .append(getTag(rule, ruleClass));
-
-            Object defaultValue = getDefaultValue(msg, field);
-            if (defaultValue instanceof String) {
-                // todo escape
-                defaultValue = "\"" + defaultValue + "\"";
-            }
-            if (defaultValue != null) {
-                buf.append(" [default = ").append(defaultValue).append("]");
-            }
-
-            buf.append(";\n");
+        if (rules.length == 0) {
+            throw new ProtoGenException("None of @Required, @Repeated or @Optional " +
+                    "annotated for field " + field);
         }
+
+        return rules[0];
     }
 
     // fooBar => foo_bar

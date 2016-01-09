@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 public class ProtoGen {
 
     public static String gen(Class<?> c) {
-        Object annotation = getAndCheckAnnotation(c);
+        Object annotation = checkAndGetAnnotation(c);
         StringBuilder buf = new StringBuilder();
 
         if (annotation instanceof Proto) {
@@ -24,7 +24,7 @@ public class ProtoGen {
         return buf.toString();
     }
 
-    private static Object getAndCheckAnnotation(Class<?> c) {
+    private static Object checkAndGetAnnotation(Class<?> c) {
         Proto protoAnnotation = c.getAnnotation(Proto.class);
         Message msgAnnotation = c.getAnnotation(Message.class);
         Enum enumAnnotation = c.getAnnotation(Enum.class);
@@ -33,12 +33,12 @@ public class ProtoGen {
                 .filter(a -> a != null)
                 .toArray();
         if (annotations.length > 1) {
-            throw new ProtoGenException("Only one of @Proto, @Message or @Enum " +
-                    "could be annotated for class " + c);
+            throw new ProtoGenException("More than one of @Proto, @Message or @Enum " +
+                    "annotated for class " + c);
         }
         if (annotations.length == 0) {
-            throw new ProtoGenException("@Proto, @Message or @Enum " +
-                    "not annotated for class " + c);
+            throw new ProtoGenException("None of @Proto, @Message or @Enum " +
+                    "annotated for class " + c);
         }
 
         return annotations[0];
