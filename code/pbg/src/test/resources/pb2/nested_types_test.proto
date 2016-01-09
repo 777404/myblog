@@ -6,3 +6,6 @@ message SearchResponse {
     }
     repeated Result result = 1;
 }
+message SomeOtherMessage {
+  optional SearchResponse.Result result = 1;
+}

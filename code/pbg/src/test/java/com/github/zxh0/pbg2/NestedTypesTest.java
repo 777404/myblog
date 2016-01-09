@@ -18,6 +18,10 @@ public class NestedTypesTest {
         }
         @Repeated(tag = 1) Result result;
     }
+    @Message
+    static class SomeOtherMessage {
+        @Optional(tag = 1) SearchResponse.Result result;
+    }
 
     @Test
     public void test() {

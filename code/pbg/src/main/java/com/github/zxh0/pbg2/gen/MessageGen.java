@@ -3,6 +3,7 @@ package com.github.zxh0.pbg2.gen;
 import com.github.zxh0.pbg2.proto.field.rules.Optional;
 import com.github.zxh0.pbg2.proto.field.rules.Repeated;
 import com.github.zxh0.pbg2.proto.field.rules.Required;
+import com.github.zxh0.pbg2.proto.field.types.Int32;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -57,7 +58,7 @@ public class MessageGen {
                 .append("    ")
                 .append(ruleClass.getSimpleName().toLowerCase())
                 .append(" ")
-                .append(field.getType().getSimpleName().toLowerCase())
+                .append(getFieldType(field))
                 .append(" ")
                 .append(StringUtil.toSnakeCase(field.getName()))
                 .append(" = ")
@@ -101,6 +102,18 @@ public class MessageGen {
         }
 
         return rules[0];
+    }
+
+    private static String getFieldType(Field field) {
+        if (isScalarType(field)) {
+            return field.getType().getSimpleName().toLowerCase();
+        } else {
+            return field.getType().getSimpleName();
+        }
+    }
+
+    private static boolean isScalarType(Field field) {
+        return field.getType().getPackage() == Int32.class.getPackage();
     }
 
     private static int getTag(Object ruleObj, Class<?> ruleClass) {
