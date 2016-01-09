@@ -35,7 +35,7 @@ public class MessageGen {
         genNestedTypes(c, buf, indentation);
         genFields(msg, buf, indentation);
         buf.append(indentation)
-                .append("}");
+                .append("}\n");
     }
 
     private static void genNestedTypes(Class<?> c, StringBuilder buf, String indentation) {

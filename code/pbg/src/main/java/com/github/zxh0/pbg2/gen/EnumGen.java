@@ -11,7 +11,7 @@ public class EnumGen {
         buf.append("enum ").append(enumClass.getSimpleName()).append(" {\n");
         genOption(annotation, buf);
         genFields(enumClass, buf);
-        buf.append("}");
+        buf.append("}\n");
     }
 
     private static void genOption(Enum annotation, StringBuilder buf) {
