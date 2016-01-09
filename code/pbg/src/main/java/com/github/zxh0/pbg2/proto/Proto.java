@@ -13,7 +13,7 @@ public @interface Proto {
     // file options
     public String javaPackage() default "";
     public String javaOuterClassname() default "";
-    public OptimizeForOption optimizeFor() default OptimizeForOption.SPEED;
+    public OptimizeForOption optimizeFor() default OptimizeForOption.NOT_GIVEN;
     public boolean ccGenericServices() default true;
     public boolean javaGenericServices() default true;
     public boolean pyGenericServices() default true;
