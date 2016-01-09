@@ -82,12 +82,12 @@ public class MessageGen {
         try {
             field.setAccessible(true);
             Object val = field.get(msg);
-            if (val == null) {
-                return null;
-            } else {
+            if (val != null) {
                 Field defaultValue = val.getClass().getDeclaredField("defaultValue");
                 defaultValue.setAccessible(true);
                 return defaultValue.get(val);
+            } else {
+                return null;
             }
         } catch (ReflectiveOperationException e) {
             throw new ProtoGenException(e);
