@@ -9,6 +9,8 @@ import static java.lang.annotation.ElementType.TYPE;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(value={TYPE})
 public @interface Enum {
-    // todo
+
+    public boolean allowAlias() default false;
+
 }
 

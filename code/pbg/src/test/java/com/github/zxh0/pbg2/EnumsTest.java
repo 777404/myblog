@@ -7,20 +7,16 @@ import java.io.IOException;
 
 public class EnumsTest {
 
-    @Enum
-    static class Corpus {
-        static final int UNIVERSAL = 0;
-        static final int WEB = 1;
-        static final int IMAGES = 2;
-        static final int LOCAL = 3;
-        static final int NEWS = 4;
-        static final int PRODUCTS = 5;
-        static final int VIDEO = 6;
+    @Enum(allowAlias = true)
+    public static class EnumAllowingAlias {
+        public static final int UNKNOWN = 0;
+        public static final int STARTED = 1;
+        public static final int RUNNING = 1;
     }
 
     @Test
     public void test() throws IOException {
-        TestHelper.testOutput(Corpus.class, "pb2/enums_test.proto");
+        TestHelper.testOutput(EnumAllowingAlias.class, "pb2/enum_allowing_alias_test.proto");
     }
 
 }
