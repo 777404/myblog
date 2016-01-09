@@ -17,9 +17,9 @@ public class ProtoGen {
         if (annotation instanceof Proto) {
             genProto(c, (Proto) annotation, buf);
         } else if (annotation instanceof Message) {
-            genMessage(c, buf);
+            MessageGen.genMessage(c, buf);
         } else if (annotation instanceof Enum) {
-            genEnum(c, (Enum) annotation, buf);
+            EnumGen.genEnum(c, (Enum) annotation, buf);
         }
 
         return buf.toString();
@@ -50,9 +50,9 @@ public class ProtoGen {
         for (Class<?> innerClass : c.getDeclaredClasses()) {
             Object annotation = checkAndGetAnnotation(innerClass);
             if (annotation instanceof Message) {
-                genMessage(innerClass, buf);
+                MessageGen.genMessage(innerClass, buf);
             } else if (annotation instanceof Enum) {
-                genEnum(innerClass, (Enum) annotation, buf);
+                EnumGen.genEnum(innerClass, (Enum) annotation, buf);
             } else {
                 // todo
             }
@@ -83,14 +83,6 @@ public class ProtoGen {
         if (hasOption) {
             buf.append("\n");
         }
-    }
-
-    private static void genMessage(Class<?> c, StringBuilder buf) {
-        MessageGen.genMessage(c, buf);
-    }
-
-    private static void genEnum(Class<?> c, Enum enumAnnotation, StringBuilder buf) {
-        EnumGen.genEnum(c, enumAnnotation, buf);
     }
 
 }
