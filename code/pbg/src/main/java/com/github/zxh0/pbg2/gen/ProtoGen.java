@@ -2,40 +2,65 @@ package com.github.zxh0.pbg2.gen;
 
 import com.github.zxh0.pbg2.proto.Enum;
 import com.github.zxh0.pbg2.proto.Message;
+import com.github.zxh0.pbg2.proto.Proto;
 
 import java.lang.reflect.Constructor;
+import java.util.stream.Stream;
 
 public class ProtoGen {
 
-    public static String gen(Class<?> msgOrEnumClass) {
+    public static String gen(Class<?> c) {
+        Object annotation = getAndCheckAnnotation(c);
+        StringBuilder buf = new StringBuilder();
+
+        if (annotation instanceof Proto) {
+            genProto(c, buf);
+        } else if (annotation instanceof Message) {
+            genMessage(c, buf);
+        } else if (annotation instanceof Enum) {
+            genEnum(c, (Enum) annotation, buf);
+        }
+
+        return buf.toString();
+    }
+
+    private static Object getAndCheckAnnotation(Class<?> c) {
+        Proto protoAnnotation = c.getAnnotation(Proto.class);
+        Message msgAnnotation = c.getAnnotation(Message.class);
+        Enum enumAnnotation = c.getAnnotation(Enum.class);
+
+        Object[] annotations = Stream.of(protoAnnotation, msgAnnotation, enumAnnotation)
+                .filter(a -> a != null)
+                .toArray();
+        if (annotations.length > 1) {
+            throw new ProtoGenException("Only one of @Proto, @Message or @Enum " +
+                    "could be annotated for class " + c);
+        }
+        if (annotations.length == 0) {
+            throw new ProtoGenException("@Proto, @Message or @Enum " +
+                    "not annotated for class " + c);
+        }
+
+        return annotations[0];
+    }
+
+    private static void genProto(Class<?> c, StringBuilder buf) {
+        c.getDeclaredClasses();
+    }
+
+    private static void genMessage(Class<?> c, StringBuilder buf) {
         try {
-            Constructor<?> init = msgOrEnumClass.getDeclaredConstructor();
+            Constructor<?> init = c.getDeclaredConstructor();
             init.setAccessible(true);
-            Object msgOrEnum = init.newInstance();
-            return gen(msgOrEnum);
+            Object msg = init.newInstance();
+            MessageGen.genMessage(msg, buf);
         } catch (ReflectiveOperationException e) {
             throw new ProtoGenException(e);
         }
     }
 
-    private static String gen(Object msgOrEnum) {
-        StringBuilder buf = new StringBuilder();
-
-        Class<?> c = msgOrEnum.getClass();
-        Message msgAnnotation = c.getAnnotation(Message.class);
-        Enum enumAnnotation = c.getAnnotation(Enum.class);
-
-        if (msgAnnotation != null && enumAnnotation != null) {
-            throw new ProtoGenException("Both @Message and @Enum annotated for class " + c);
-        } else if (msgAnnotation != null) {
-            MessageGen.genMessage(msgOrEnum, buf);
-        } else if (enumAnnotation != null) {
-            EnumGen.genEnum(msgOrEnum, enumAnnotation, buf);
-        } else {
-            throw new ProtoGenException("@Message or @Enum not annotated for class " + c);
-        }
-
-        return buf.toString();
+    private static void genEnum(Class<?> c, Enum enumAnnotation, StringBuilder buf) {
+        EnumGen.genEnum(c, enumAnnotation, buf);
     }
 
 }

@@ -7,8 +7,7 @@ import java.lang.reflect.Modifier;
 
 public class EnumGen {
 
-    public static void genEnum(Object enumObj, Enum annotation, StringBuilder buf) {
-        Class<?> enumClass = enumObj.getClass();
+    public static void genEnum(Class<?> enumClass, Enum annotation, StringBuilder buf) {
         buf.append("enum ").append(enumClass.getSimpleName()).append(" {\n");
         genOption(annotation, buf);
         genFields(enumClass, buf);
