@@ -1,0 +1,16 @@
+message DefaultValues {
+    optional bool f1 = 1 [default = true];
+    optional int32 f2 = 2 [default = 100];
+    optional int64 f3 = 3 [default = 100];
+    optional uint32 f4 = 4 [default = 100];
+    optional uint64 f5 = 5 [default = 100];
+    optional sint32 f6 = 6 [default = 100];
+    optional sint64 f7 = 7 [default = 100];
+    optional fixed32 f8 = 8 [default = 100];
+    optional fixed64 f9 = 9 [default = 100];
+    optional sfixed32 f10 = 10 [default = 100];
+    optional sfixed64 f11 = 11 [default = 100];
+    optional float f12 = 12 [default = 3.14];
+    optional double f13 = 13 [default = 3.14];
+    optional string f14 = 14 [default = "abc"];
+}
