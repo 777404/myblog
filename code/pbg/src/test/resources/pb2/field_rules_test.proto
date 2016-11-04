@@ -1,6 +1,0 @@
-message FieldRules {
-    required int32 int_field = 1;
-    repeated float f2 = 2;
-    optional sint32 f3 = 3;
-    optional fixed64 f4 = 4 [default = 123];
-}
