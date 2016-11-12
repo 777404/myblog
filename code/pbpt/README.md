@@ -1,4 +1,0 @@
-pbpt
-====
-
-protobuf project template
